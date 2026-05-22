@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Керамика — макеты кастомной админки</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Inter:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="ceramic.css" />
+    <style>
+      html, body { margin: 0; padding: 0; }
+      body { font-family: 'Inter', system-ui, sans-serif; }
+      .cer-page { height: 100%; }
+    </style>
+    <script
+      src="https://unpkg.com/react@18.3.1/umd/react.development.js"
+      integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js"
+      integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js"
+      integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="text/babel" src="design-canvas.jsx"></script>
+    <script type="text/babel" src="admin/_shared.jsx"></script>
+    <script type="text/babel" src="admin/login.jsx"></script>
+    <script type="text/babel" src="admin/dashboard.jsx"></script>
+    <script type="text/babel" src="admin/products.jsx"></script>
+    <script type="text/babel" src="admin/product-edit.jsx"></script>
+    <script type="text/babel" src="admin/orders.jsx"></script>
+    <script type="text/babel" src="admin/media.jsx"></script>
+    <script type="text/babel" src="admin/create-wizard.jsx"></script>
+
+    <script type="text/babel">
+      function App() {
+        return (
+          <DesignCanvas>
+            <DCSection
+              id="entry"
+              title="Вход в админку"
+              subtitle="Сдержанный, как и сайт — без фото-полотна"
+            >
+              <DCArtboard id="login" label="Экран входа" width={1440} height={900}>
+                <AdminLogin />
+              </DCArtboard>
+            </DCSection>
+
+            <DCSection
+              id="home"
+              title="Главная админки"
+              subtitle="«Что в мастерской сегодня» — не таблицы коллекций"
+            >
+              <DCArtboard id="dashboard" label="Дашборд" width={1440} height={900}>
+                <AdminDashboard />
+              </DCArtboard>
+            </DCSection>
+
+            <DCSection
+              id="products-flow"
+              title="Изделия"
+              subtitle="Список карточек с фото · редактирование с табами · визард для нового"
+            >
+              <DCArtboard id="products-list" label="Список изделий — галерея" width={1440} height={1100}>
+                <AdminProducts />
+              </DCArtboard>
+              <DCArtboard id="create-1" label="Новое изделие · шаг 1 — Фото" width={1440} height={900}>
+                <AdminCreateStep1 />
+              </DCArtboard>
+              <DCArtboard id="create-2" label="Шаг 2 — Название и категория" width={1440} height={900}>
+                <AdminCreateStep2 />
+              </DCArtboard>
+              <DCArtboard id="create-3" label="Шаг 3 — Размеры и материал" width={1440} height={900}>
+                <AdminCreateStep3 />
+              </DCArtboard>
+              <DCArtboard id="create-4" label="Шаг 4 — История + публикация" width={1440} height={1020}>
+                <AdminCreateStep4 />
+              </DCArtboard>
+              <DCArtboard id="product-edit" label="Редактирование существующего изделия" width={1440} height={1240}>
+                <AdminProductEdit />
+              </DCArtboard>
+            </DCSection>
+
+            <DCSection
+              id="media"
+              title="Медиа-библиотека"
+              subtitle="Drag-and-drop, бейджи «не используется», фильтры по разделам сайта"
+            >
+              <DCArtboard id="media-grid" label="Все фотографии" width={1440} height={1180}>
+                <AdminMedia />
+              </DCArtboard>
+            </DCSection>
+
+            <DCSection
+              id="orders-flow"
+              title="Заявки"
+              subtitle="Список со статусами и метками HoReCa · подробная карточка с заметкой для себя"
+            >
+              <DCArtboard id="orders-list" label="Список заявок" width={1440} height={900}>
+                <AdminOrders />
+              </DCArtboard>
+              <DCArtboard id="order-detail" label="Карточка заявки" width={1440} height={1020}>
+                <AdminOrderDetail />
+              </DCArtboard>
+            </DCSection>
+          </DesignCanvas>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById('root'));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

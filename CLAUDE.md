@@ -10,7 +10,9 @@
 - `src/app/(frontend)/` — витрина: `page.tsx` (главная), `catalog/`, `product/[slug]/`, `gallery/`, `order/`
 - `src/app/(payload)/`  — admin UI + REST/GraphQL (boilerplate Payload, **не править вручную**)
 - `src/collections/`    — модель данных: Categories, Products, Gallery, Orders, Users
-- `src/lib/data.ts`     — **единственная точка доступа к данным** через Payload Local API. Страницы зовут `getProducts()/getCategories()/getProductBySlug()/getGallery()/createOrder()`, маппят записи в простые типы. Менять источник данных — здесь, страницы не трогать.
+- `src/globals/`        — `Homepage` (Payload Global): редактируемый контент главной (hero, о мастере, процесс, атмосфера, CTA, instagram). В админке — «Главная страница». Картинки по паттерну upload+URL-fallback.
+- `src/lib/data.ts`     — **единственная точка доступа к данным** через Payload Local API. Страницы зовут `getProducts()/getCategories()/getProductBySlug()/getGallery()/getHomepage()/createOrder()`, маппят записи в простые типы. `getHomepage()` merge'ит глобал поверх `HOMEPAGE_DEFAULTS` (= исходный хардкод), пустые поля → дефолт. Менять источник данных — здесь, страницы не трогать.
+- `src/lib/revalidate.ts` — `safeRevalidate()`: ISR-сброс кэша из хуков Payload, безопасен вне request-scope (seed/CLI не падают).
 - `src/components/`      — `Shell` (навбар/футер, проп `active`/`isHero`), `ProductCard`, `Lightbox`
 - `public/css/ceramic.css`, `public/js/ceramic.js` — дизайн-система и анимации, **копия из `_visual/`**. Это источник визуала; правки вносить осознанно, `_visual/` — референс.
 - `scripts/seed.ts`     — сидинг демо-данных (`payload run`)
@@ -28,6 +30,9 @@
   витрина падает `relation does not exist`. В Docker миграции накатывает one-shot сервис
   `migrate` до старта `app` (см. `docker-compose.yml`).
 - **id в Postgres — числовые** (не uuid). Учитывай в типах (relation `product` = `number`).
+- **ISR:** главная/галерея/товар — `export const revalidate = 3600` + мгновенный сброс через
+  `safeRevalidate()` в `afterChange/afterDelete`-хуках (Products/Categories/Gallery/Homepage).
+  Каталог и заказ читают `searchParams` → всегда динамические, ISR к ним неприменим.
 - **Не запускать интерактивные scaffold-CLI** (`create-payload-app` и т.п.) в этой среде —
   падают на TTY даже через `!`. Каркас собирать вручную.
 - Изображения сейчас — внешние URL (поле `images` = массив `{url}`), не загруженные файлы.
