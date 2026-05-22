@@ -1,4 +1,20 @@
 services:
+  # one-shot: накатывает миграции Payload до старта app, затем выходит
+  migrate:
+    build:
+      context: .
+      target: builder
+    command: npx payload migrate
+    restart: "no"
+    environment:
+      DATABASE_URI: postgres://ceramic:${DB_PASSWORD}@postgres:5432/ceramic
+      PAYLOAD_SECRET: ${PAYLOAD_SECRET}
+    networks:
+      - internal
+    depends_on:
+      postgres:
+        condition: service_healthy
+
   app:
     build: .
     container_name: ceramic-app
@@ -16,6 +32,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
     deploy:
       resources:
         limits:

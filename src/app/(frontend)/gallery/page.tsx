@@ -1,5 +1,6 @@
 import React from 'react'
 import Shell from '@/components/Shell'
+import Lightbox from '@/components/Lightbox'
 import { getGallery } from '@/lib/data'
 
 export const dynamic = 'force-dynamic'
@@ -29,12 +30,7 @@ export default async function GalleryPage() {
         </div>
       </section>
 
-      <div id="cer-lightbox" className="cer-lightbox">
-        <button className="cer-lightbox__close">&times;</button>
-        <button className="cer-lightbox__prev">&#8249;</button>
-        <img src="" alt="" />
-        <button className="cer-lightbox__next">&#8250;</button>
-      </div>
+      <Lightbox />
     </Shell>
   )
 }

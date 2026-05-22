@@ -1,4 +1,4 @@
-import { getPayload } from 'payload'
+import { getPayload, type CollectionSlug } from 'payload'
 import config from '@payload-config'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
@@ -8,6 +8,11 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 const seed = JSON.parse(readFileSync(join(__dirname, '../src/data/seed.json'), 'utf-8'))
 
 const payload = await getPayload({ config })
+
+async function findOne(collection: CollectionSlug, where: Record<string, any>) {
+  const { docs } = await payload.find({ collection, where, limit: 1 })
+  return docs[0] ?? null
+}
 
 // --- admin user ---
 const users = await payload.find({ collection: 'users', limit: 1 })
@@ -21,16 +26,15 @@ if (users.totalDocs === 0) {
 // --- categories ---
 const catMap: Record<string, any> = {}
 for (const c of seed.categories) {
-  const found = await payload.find({ collection: 'categories', where: { slug: { equals: c.slug } }, limit: 1 })
-  catMap[c.name] = found.docs[0]?.id ?? (await payload.create({ collection: 'categories', data: c })).id
+  const existing = await findOne('categories', { slug: { equals: c.slug } })
+  catMap[c.name] = existing?.id ?? (await payload.create({ collection: 'categories', data: c })).id
 }
 console.log(`✓ categories: ${Object.keys(catMap).length}`)
 
 // --- products ---
 let pCount = 0
 for (const p of seed.products) {
-  const found = await payload.find({ collection: 'products', where: { slug: { equals: p.slug } }, limit: 1 })
-  if (found.totalDocs) continue
+  if (await findOne('products', { slug: { equals: p.slug } })) continue
   await payload.create({
     collection: 'products',
     data: {
@@ -46,8 +50,7 @@ console.log(`✓ products: +${pCount}`)
 // --- gallery ---
 let gCount = 0
 for (const g of seed.gallery) {
-  const found = await payload.find({ collection: 'gallery', where: { title: { equals: g.title } }, limit: 1 })
-  if (found.totalDocs) continue
+  if (await findOne('gallery', { title: { equals: g.title } })) continue
   await payload.create({ collection: 'gallery', data: g })
   gCount++
 }

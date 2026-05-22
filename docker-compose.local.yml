@@ -1,8 +1,21 @@
 # Локальная проверка ПРОДАКШН-образа без Traefik.
-# Поднимает тот же Dockerfile, публикует порт 3001, отдельный том БД.
 #   docker compose -f docker-compose.local.yml up --build
 # Витрина: http://localhost:3001 · Админка: http://localhost:3001/admin
 services:
+  # one-shot: накатывает миграции Payload и выходит (билдер-стейдж = есть CLI)
+  migrate:
+    build:
+      context: .
+      target: builder
+    command: npx payload migrate
+    environment:
+      DATABASE_URI: postgres://ceramic:ceramic_secret@postgres:5432/ceramic
+      PAYLOAD_SECRET: local-test-secret-change-me-32chars
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
   app:
     build: .
     container_name: ceramic-app-local
@@ -16,6 +29,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
 
   postgres:
     image: postgres:16-alpine

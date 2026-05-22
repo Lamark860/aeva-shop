@@ -8,8 +8,10 @@ export const dynamic = 'force-dynamic'
 export default async function Catalog({ searchParams }: { searchParams: Promise<{ category?: string }> }) {
   const { category } = await searchParams
   const currentCategory = category ?? null
-  const categories = await getCategories()
-  const products = await getProducts({ categorySlug: currentCategory ?? undefined })
+  const [categories, products] = await Promise.all([
+    getCategories(),
+    getProducts({ categorySlug: currentCategory ?? undefined }),
+  ])
 
   return (
     <Shell active="catalog">

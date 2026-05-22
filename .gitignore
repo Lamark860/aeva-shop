@@ -6,3 +6,6 @@ node_modules/
 /build
 /dist
 src/payload-types.ts
+
+# build artifact
+*.tsbuildinfo

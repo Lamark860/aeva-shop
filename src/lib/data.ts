@@ -38,8 +38,7 @@ export async function getProducts(opts: { categorySlug?: string; featured?: bool
   if (opts.featured) where.featured = { equals: true }
   if (opts.categorySlug) where['category.slug'] = { equals: opts.categorySlug }
   const { docs } = await payload.find({
-    collection: 'products', sort: 'sort_order', depth: 1,
-    where: Object.keys(where).length ? where : undefined,
+    collection: 'products', sort: 'sort_order', depth: 1, where,
     limit: opts.limit ?? 100,
   })
   return docs.map(mapProduct)

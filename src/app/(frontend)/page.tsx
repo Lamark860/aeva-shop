@@ -1,6 +1,7 @@
 import React from 'react'
 import Shell from '@/components/Shell'
 import ProductCard from '@/components/ProductCard'
+import Lightbox from '@/components/Lightbox'
 import { getProducts, getGallery } from '@/lib/data'
 
 export const dynamic = 'force-dynamic'
@@ -26,9 +27,11 @@ const instaImages = [
 ]
 
 export default async function Home() {
-  const collectionPreview = await getProducts({ limit: 3 })
-  const featured = await getProducts({ featured: true, limit: 4 })
-  const galleryItems = await getGallery(9)
+  const [collectionPreview, featured, galleryItems] = await Promise.all([
+    getProducts({ limit: 3 }),
+    getProducts({ featured: true, limit: 4 }),
+    getGallery(9),
+  ])
 
   return (
     <Shell active="home" isHero={true}>
@@ -159,12 +162,7 @@ export default async function Home() {
         </div>
       </section>
 
-      <div id="cer-lightbox" className="cer-lightbox">
-        <button className="cer-lightbox__close">&times;</button>
-        <button className="cer-lightbox__prev">&#8249;</button>
-        <img src="" alt="" />
-        <button className="cer-lightbox__next">&#8250;</button>
-      </div>
+      <Lightbox />
     </Shell>
   )
 }
