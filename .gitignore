@@ -1,0 +1,10 @@
+node_modules/
+.DS_Store
+dist/
+.astro/
+.next/
+pb_data/
+pocketbase
+*.log
+.env
+.env.local

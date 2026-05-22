@@ -1,0 +1,32 @@
+{
+  "categories": [
+    { "name": "Чаши",   "slug": "chashi",  "description": "Чаши и пиалы ручной работы",          "image": "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=400&h=400&fit=crop", "sort_order": 1 },
+    { "name": "Вазы",   "slug": "vazy",    "description": "Авторские вазы из натуральной глины",   "image": "https://images.unsplash.com/photo-1612196808214-b8e1d6145a8c?w=400&h=400&fit=crop", "sort_order": 2 },
+    { "name": "Тарелки","slug": "tarelki", "description": "Тарелки и блюда",                       "image": "https://images.unsplash.com/photo-1610701596061-2ecf227e85b2?w=400&h=400&fit=crop", "sort_order": 3 },
+    { "name": "Кружки", "slug": "kruzhki", "description": "Кружки ручной лепки",                   "image": "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=400&h=400&fit=crop", "sort_order": 4 },
+    { "name": "Декор",  "slug": "dekor",   "description": "Декоративные изделия",                  "image": "https://images.unsplash.com/photo-1602028915047-37269d1a73f7?w=400&h=400&fit=crop", "sort_order": 5 },
+    { "name": "Наборы", "slug": "nabory",  "description": "Наборы изделий",                        "image": "https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=400&h=400&fit=crop", "sort_order": 6 }
+  ],
+  "products": [
+    { "name": "Чаша «Рассвет»",        "slug": "chasha-rassvet",      "category": "Чаши",   "price": 3200, "featured": true,  "short_description": "Чаша из натуральной глины",      "description": "Натуральная глина\nручная работа\nдвойной обжиг",            "images": ["https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=600&h=600&fit=crop", "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=600&h=600&fit=crop", "https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=600&h=600&fit=crop"] },
+    { "name": "Ваза «Тишина»",         "slug": "vaza-tishina",        "category": "Вазы",   "price": 5800, "featured": true,  "short_description": "Ваза из шамотной глины",         "description": "Шамотная глина\nминималистичная форма\nматовая глазурь",     "images": ["https://images.unsplash.com/photo-1612196808214-b8e1d6145a8c?w=600&h=600&fit=crop", "https://images.unsplash.com/photo-1493106641515-6b5631de4bb9?w=600&h=600&fit=crop"] },
+    { "name": "Тарелка «Земля»",       "slug": "tarelka-zemlya",      "category": "Тарелки","price": 2400, "featured": true,  "short_description": "Тарелка ручной работы",          "description": "Натуральная глина\nтёплый терракотовый оттенок\nбезопасна для пищи", "images": ["https://images.unsplash.com/photo-1610701596061-2ecf227e85b2?w=600&h=600&fit=crop", "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=600&h=600&fit=crop"] },
+    { "name": "Кружка «Утро»",         "slug": "kruzhka-utro",        "category": "Кружки", "price": 1800, "featured": true,  "short_description": "Кружка ручной лепки",            "description": "Ручная лепка\nматовая поверхность\nобъём 300 мл",            "images": ["https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=600&h=600&fit=crop"] },
+    { "name": "Подсвечник «Вечер»",    "slug": "podsvechnik-vecher",  "category": "Декор",  "price": 2100, "featured": false, "short_description": "Керамический подсвечник",        "description": "Шамотная глина\nручная работа\nтёплый свет",                 "images": ["https://images.unsplash.com/photo-1602028915047-37269d1a73f7?w=600&h=600&fit=crop"] },
+    { "name": "Пиала «Медитация»",     "slug": "piala-meditaciya",    "category": "Чаши",   "price": 1500, "featured": false, "short_description": "Пиала для чайной церемонии",     "description": "Натуральная глина\nгладкая глазурь\nобъём 200 мл",           "images": ["https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=600&h=600&fit=crop"] },
+    { "name": "Ваза «Поток»",          "slug": "vaza-potok",          "category": "Вазы",   "price": 6500, "featured": false, "short_description": "Авторская ваза",                 "description": "Авторская форма\nнатуральная глазурь\nвысота 25 см",         "images": ["https://images.unsplash.com/photo-1493106641515-6b5631de4bb9?w=600&h=600&fit=crop"] },
+    { "name": "Набор «Семья»",         "slug": "nabor-semya",         "category": "Наборы", "price": 8900, "featured": false, "short_description": "Набор из 4 чаш",                 "description": "4 чаши\nнатуральная глина\nкаждая уникальна",                 "images": ["https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=600&h=600&fit=crop"] },
+    { "name": "Блюдо «Океан»",         "slug": "blyudo-okean",        "category": "Тарелки","price": 4200, "featured": false, "short_description": "Декоративное блюдо",             "description": "Синяя глазурь\nручная работа\nдиаметр 30 см",                 "images": ["https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=600&h=600&fit=crop"] }
+  ],
+  "gallery": [
+    { "title": "Мастерская",       "image": "https://images.unsplash.com/photo-1556909114-44e3e70034e2?w=600&h=800&fit=crop", "size": "tall",   "sort_order": 0 },
+    { "title": "Гончарный круг",   "image": "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=600&h=400&fit=crop", "size": "wide",   "sort_order": 1 },
+    { "title": "Глазурование",     "image": "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=400&h=400&fit=crop", "size": "normal", "sort_order": 2 },
+    { "title": "Детали",           "image": "https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=400&h=600&fit=crop", "size": "tall",   "sort_order": 3 },
+    { "title": "Текстуры",         "image": "https://images.unsplash.com/photo-1493106641515-6b5631de4bb9?w=600&h=400&fit=crop", "size": "wide",   "sort_order": 4 },
+    { "title": "Коллекция",        "image": "https://images.unsplash.com/photo-1612196808214-b8e1d6145a8c?w=400&h=400&fit=crop", "size": "normal", "sort_order": 5 },
+    { "title": "Руки мастера",     "image": "https://images.unsplash.com/photo-1556909114-44e3e70034e2?w=400&h=600&fit=crop", "size": "tall",   "sort_order": 6 },
+    { "title": "Инструменты",      "image": "https://images.unsplash.com/photo-1602028915047-37269d1a73f7?w=600&h=400&fit=crop", "size": "wide",   "sort_order": 7 },
+    { "title": "Обжиг",            "image": "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=400&h=400&fit=crop", "size": "normal", "sort_order": 8 }
+  ]
+}
