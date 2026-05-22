@@ -1,4 +1,5 @@
 import React from 'react'
+import Script from 'next/script'
 
 export const metadata = {
   title: 'Авторская керамика ручной работы',
@@ -17,11 +18,13 @@ export default function FrontendLayout({ children }: { children: React.ReactNode
         <link rel="stylesheet" href="/css/ceramic.css" />
       </head>
       <body className="cer-page">
-        <div className="cer-scroll-progress"></div>
+        {/* эти div'ы оживляет ceramic.js (инлайн-стили) — гасим hydration-warning */}
+        <div className="cer-scroll-progress" suppressHydrationWarning></div>
         <div className="cer-grain"></div>
-        <div className="cer-cursor"></div>
+        <div className="cer-cursor" suppressHydrationWarning></div>
         {children}
-        <script src="/js/ceramic.js" defer></script>
+        {/* afterInteractive — ceramic.js стартует строго после гидратации */}
+        <Script src="/js/ceramic.js" strategy="afterInteractive" />
       </body>
     </html>
   )

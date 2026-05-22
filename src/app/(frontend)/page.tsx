@@ -2,6 +2,7 @@ import React from 'react'
 import Shell from '@/components/Shell'
 import ProductCard from '@/components/ProductCard'
 import Lightbox from '@/components/Lightbox'
+import Signature from '@/components/Signature'
 import { getProducts, getGallery } from '@/lib/data'
 
 export const dynamic = 'force-dynamic'
@@ -72,6 +73,7 @@ export default async function Home() {
               <h2>Каждое изделие —<br />история</h2>
               <p>Я создаю керамику вручную в небольшой мастерской. Каждое изделие уникально.</p>
               <p>Натуральная глина, ручная лепка, двойной обжиг — каждая деталь продумана и выполнена с любовью к материалу.</p>
+              <div style={{ margin: '8px 0 24px' }}><Signature /></div>
               <a href="/gallery" className="cer-btn cer-btn--ghost">Смотреть галерею</a>
             </div>
           </div>
@@ -96,7 +98,7 @@ export default async function Home() {
               ))}
             </div>
           </div>
-          <div className="cer-process-progress"><div className="cer-process-progress__bar"></div></div>
+          <div className="cer-process-progress"><div className="cer-process-progress__bar" suppressHydrationWarning></div></div>
         </div>
       </section>
 

@@ -2202,3 +2202,27 @@
     .cer-cursor { display: none !important; }
 }
 
+/* ---------- Print (страница товара на печать) ---------- */
+@media print {
+    .cer-nav, .cer-footer, .cer-scroll-progress, .cer-grain, .cer-cursor,
+    .cer-lightbox, .cer-marquee, .cer-process-wrapper, .cer-atmospheric,
+    .cer-insta-grid, .cer-cta, .cer-product__actions, .cer-product__thumbs {
+        display: none !important;
+    }
+    .cer-page { background: #fff !important; color: #000 !important; }
+    * {
+        animation: none !important;
+        transition: none !important;
+        box-shadow: none !important;
+        text-shadow: none !important;
+    }
+    a { color: #000 !important; text-decoration: none; }
+    .cer-section { padding: 16px 0 !important; }
+    .cer-product { grid-template-columns: 1fr 1fr !important; gap: 24px !important; }
+    h1, h2, h3, p,
+    .cer-product__name, .cer-product__price, .cer-product__category,
+    .cer-product__features li { color: #000 !important; }
+    .cer-product__main-image { max-height: 60vh; object-fit: contain; }
+    @page { margin: 1.5cm; }
+}
+

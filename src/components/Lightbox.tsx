@@ -6,7 +6,8 @@ export default function Lightbox() {
     <div id="cer-lightbox" className="cer-lightbox">
       <button className="cer-lightbox__close">&times;</button>
       <button className="cer-lightbox__prev">&#8249;</button>
-      <img src="" alt="" />
+      {/* src проставляет ceramic.js при открытии */}
+      <img alt="" />
       <button className="cer-lightbox__next">&#8250;</button>
     </div>
   )
