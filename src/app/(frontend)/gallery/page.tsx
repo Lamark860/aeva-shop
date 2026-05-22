@@ -3,7 +3,8 @@ import Shell from '@/components/Shell'
 import Lightbox from '@/components/Lightbox'
 import { getGallery } from '@/lib/data'
 
-export const dynamic = 'force-dynamic'
+// ISR: фон-ребилд + мгновенный сброс через revalidatePath из хуков Gallery
+export const revalidate = 3600
 export const metadata = { title: 'Галерея — Керамика' }
 
 export default async function GalleryPage() {

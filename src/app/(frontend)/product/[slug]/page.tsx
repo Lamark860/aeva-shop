@@ -3,7 +3,9 @@ import { redirect } from 'next/navigation'
 import Shell from '@/components/Shell'
 import { getProductBySlug, formatPrice, mainImage } from '@/lib/data'
 
-export const dynamic = 'force-dynamic'
+// ISR: страницы товаров кэшируются и пересобираются по требованию (revalidatePath)
+// или раз в час; новые slug'и рендерятся on-demand (dynamicParams по умолчанию true)
+export const revalidate = 3600
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params

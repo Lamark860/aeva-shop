@@ -8,6 +8,11 @@ export const metadata = { title: 'Индивидуальный заказ — К
 export default async function OrderPage({ searchParams }: { searchParams: Promise<{ product?: string; sent?: string; error?: string }> }) {
   const { product = '', sent, error } = await searchParams
   const success = sent === '1'
+  const errorText = error === 'rate'
+    ? 'Слишком много заявок за короткое время. Попробуйте через несколько минут.'
+    : error === '1'
+      ? 'Проверьте поля: имя, корректный email и описание заказа обязательны.'
+      : null
 
   return (
     <Shell active="order">
@@ -23,14 +28,19 @@ export default async function OrderPage({ searchParams }: { searchParams: Promis
         <div className="cer-container">
           <div className="cer-order">
             {success && <div className="cer-flash">Заявка отправлена! Мы свяжемся с вами в ближайшее время.</div>}
-            {error === '1' && (
+            {errorText && (
               <div className="cer-flash" style={{ borderColor: '#c0392b', color: '#c0392b', background: 'rgba(192,57,43,0.08)' }}>
-                Проверьте поля: имя, корректный email и описание заказа обязательны.
+                {errorText}
               </div>
             )}
 
             {!success && (
               <form action={submitOrder} className="cer-order__form">
+                {/* honeypot: скрыт от людей (aria-hidden + off-screen), боты заполняют → заявка отбрасывается */}
+                <div aria-hidden="true" style={{ position: 'absolute', left: '-9999px', width: 1, height: 1, overflow: 'hidden' }}>
+                  <label htmlFor="website">Website</label>
+                  <input type="text" id="website" name="website" tabIndex={-1} autoComplete="off" />
+                </div>
                 <div className="form-group">
                   <label htmlFor="name">Имя</label>
                   <input type="text" id="name" name="name" placeholder="Как к вам обращаться" />

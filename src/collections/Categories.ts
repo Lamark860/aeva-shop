@@ -1,9 +1,15 @@
 import type { CollectionConfig } from 'payload'
+import { safeRevalidate } from '../lib/revalidate'
 
 export const Categories: CollectionConfig = {
   slug: 'categories',
   admin: { useAsTitle: 'name', defaultColumns: ['name', 'slug', 'sort_order'] },
   access: { read: () => true },
+  // имя категории показывается в карточках товара (главная) и на странице товара
+  hooks: {
+    afterChange: [() => { safeRevalidate('/', ['/product/[slug]', 'page']) }],
+    afterDelete: [() => { safeRevalidate('/', ['/product/[slug]', 'page']) }],
+  },
   fields: [
     { name: 'name', type: 'text', required: true },
     { name: 'slug', type: 'text', required: true, unique: true, index: true },
