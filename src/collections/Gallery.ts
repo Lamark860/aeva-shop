@@ -6,7 +6,8 @@ export const Gallery: CollectionConfig = {
   access: { read: () => true },
   fields: [
     { name: 'title', type: 'text', required: true },
-    { name: 'image', type: 'text', required: true, admin: { description: 'URL изображения' } },
+    { name: 'photo', type: 'upload', relationTo: 'media', label: 'Фото (загруженное)', admin: { description: 'Приоритетно над URL ниже' } },
+    { name: 'image', type: 'text', label: 'Фото по URL (запасной / демо)', admin: { description: 'Используется, если не загружено фото' } },
     { name: 'description', type: 'textarea' },
     {
       name: 'size', type: 'select', defaultValue: 'normal',

@@ -24,6 +24,7 @@ services:
       PAYLOAD_SECRET: ${PAYLOAD_SECRET}
       NEXT_PUBLIC_SERVER_URL: https://${DOMAIN}
       NODE_ENV: production
+      MEDIA_DIR: /app/media
     volumes:
       - ./uploads:/app/media
     networks:

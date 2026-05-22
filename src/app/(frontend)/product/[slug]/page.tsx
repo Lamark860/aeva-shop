@@ -5,6 +5,12 @@ import { getProductBySlug, formatPrice, mainImage } from '@/lib/data'
 
 export const dynamic = 'force-dynamic'
 
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params
+  const product = await getProductBySlug(slug)
+  return { title: product ? `${product.name} — Керамика` : 'Изделие — Керамика' }
+}
+
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
   const product = await getProductBySlug(slug)

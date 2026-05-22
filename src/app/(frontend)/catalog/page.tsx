@@ -4,6 +4,7 @@ import ProductCard from '@/components/ProductCard'
 import { getProducts, getCategories } from '@/lib/data'
 
 export const dynamic = 'force-dynamic'
+export const metadata = { title: 'Каталог — Керамика' }
 
 export default async function Catalog({ searchParams }: { searchParams: Promise<{ category?: string }> }) {
   const { category } = await searchParams

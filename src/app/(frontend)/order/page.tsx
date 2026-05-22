@@ -3,6 +3,7 @@ import Shell from '@/components/Shell'
 import { submitOrder } from './actions'
 
 export const dynamic = 'force-dynamic'
+export const metadata = { title: 'Индивидуальный заказ — Керамика' }
 
 export default async function OrderPage({ searchParams }: { searchParams: Promise<{ product?: string; sent?: string; error?: string }> }) {
   const { product = '', sent, error } = await searchParams

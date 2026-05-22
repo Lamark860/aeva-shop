@@ -2180,3 +2180,23 @@
     }
 }
 
+/* ---------- Reduced Motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+        scroll-behavior: auto !important;
+    }
+    .cer-fade-in, .cer-fade-scale, .cer-fade-left, .cer-fade-right,
+    .cer-reveal-image, .cer-text-reveal {
+        opacity: 1 !important;
+        transform: none !important;
+    }
+    .cer-reveal-image img { clip-path: none !important; }
+    .cer-text-reveal > * { transform: none !important; }
+    .cer-product__features li { opacity: 1 !important; transform: none !important; }
+    .cer-marquee__track { animation: none !important; }
+    .cer-cursor { display: none !important; }
+}
+

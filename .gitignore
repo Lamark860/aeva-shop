@@ -7,5 +7,9 @@ node_modules/
 /dist
 src/payload-types.ts
 
+# загруженные через админку медиафайлы (dev)
+/media/
+/uploads/
+
 # build artifact
 *.tsbuildinfo

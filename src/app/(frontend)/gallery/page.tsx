@@ -4,6 +4,7 @@ import Lightbox from '@/components/Lightbox'
 import { getGallery } from '@/lib/data'
 
 export const dynamic = 'force-dynamic'
+export const metadata = { title: 'Галерея — Керамика' }
 
 export default async function GalleryPage() {
   const items = await getGallery()

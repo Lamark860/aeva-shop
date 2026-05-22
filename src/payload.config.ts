@@ -6,6 +6,7 @@ import { fileURLToPath } from 'url'
 import sharp from 'sharp'
 
 import { Users } from './collections/Users'
+import { Media } from './collections/Media'
 import { Categories } from './collections/Categories'
 import { Products } from './collections/Products'
 import { Gallery } from './collections/Gallery'
@@ -19,7 +20,7 @@ const serverURL = process.env.NEXT_PUBLIC_SERVER_URL || ''
 export default buildConfig({
   serverURL: serverURL || undefined,
   admin: { user: Users.slug, importMap: { baseDir: path.resolve(dirname) } },
-  collections: [Users, Categories, Products, Gallery, Orders],
+  collections: [Users, Media, Categories, Products, Gallery, Orders],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   // за HTTPS-прокси (Traefik) admin шлёт запросы на свой домен — разрешаем его

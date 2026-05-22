@@ -24,6 +24,7 @@ services:
       PAYLOAD_SECRET: local-test-secret-change-me-32chars
       NEXT_PUBLIC_SERVER_URL: http://localhost:3001
       NODE_ENV: production
+      MEDIA_DIR: /app/media
     ports:
       - "3001:3000"
     depends_on:

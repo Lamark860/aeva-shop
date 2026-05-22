@@ -17,11 +17,16 @@ export function formatPrice(price: number): string {
 export function mainImage(p: Product): string { return p.images?.[0] ?? '' }
 
 function mapProduct(doc: any): Product {
+  // приоритет — загруженные фото (Media), иначе URL-ссылки (демо/fallback)
+  const uploaded = Array.isArray(doc.photos)
+    ? doc.photos.map((m: any) => (typeof m === 'object' ? m?.url : null)).filter(Boolean)
+    : []
+  const urls = Array.isArray(doc.images) ? doc.images.map((i: any) => i.url).filter(Boolean) : []
   return {
     name: doc.name, slug: doc.slug, description: doc.description ?? '',
     short_description: doc.short_description, price: doc.price,
     category: typeof doc.category === 'object' && doc.category ? doc.category.name : '',
-    images: Array.isArray(doc.images) ? doc.images.map((i: any) => i.url).filter(Boolean) : [],
+    images: uploaded.length ? uploaded : urls,
     featured: !!doc.featured,
   }
 }
@@ -52,8 +57,12 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
 
 export async function getGallery(limit?: number): Promise<GalleryItem[]> {
   const payload = await client()
-  const { docs } = await payload.find({ collection: 'gallery', sort: 'sort_order', limit: limit ?? 100 })
-  return docs.map((d: any) => ({ title: d.title, image: d.image, size: d.size }))
+  const { docs } = await payload.find({ collection: 'gallery', sort: 'sort_order', depth: 1, limit: limit ?? 100 })
+  return docs.map((d: any) => ({
+    title: d.title,
+    image: (typeof d.photo === 'object' && d.photo?.url) ? d.photo.url : d.image,
+    size: d.size,
+  }))
 }
 
 export async function createOrder(data: { name: string; email: string; phone?: string; message: string; productSlug?: string }): Promise<void> {
