@@ -1,8 +1,0 @@
-node_modules/
-.next/
-.env
-*.log
-.DS_Store
-/build
-/dist
-src/payload-types.ts

@@ -1,0 +1,36 @@
+# Локальная проверка ПРОДАКШН-образа без Traefik.
+# Поднимает тот же Dockerfile, публикует порт 3001, отдельный том БД.
+#   docker compose -f docker-compose.local.yml up --build
+# Витрина: http://localhost:3001 · Админка: http://localhost:3001/admin
+services:
+  app:
+    build: .
+    container_name: ceramic-app-local
+    environment:
+      DATABASE_URI: postgres://ceramic:ceramic_secret@postgres:5432/ceramic
+      PAYLOAD_SECRET: local-test-secret-change-me-32chars
+      NEXT_PUBLIC_SERVER_URL: http://localhost:3001
+      NODE_ENV: production
+    ports:
+      - "3001:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: ceramic-postgres-local
+    environment:
+      POSTGRES_DB: ceramic
+      POSTGRES_USER: ceramic
+      POSTGRES_PASSWORD: ceramic_secret
+    volumes:
+      - pg_data_local:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ceramic"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  pg_data_local:

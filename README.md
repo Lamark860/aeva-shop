@@ -1,66 +1,69 @@
 # ceramic
 
-Магазин авторской керамики ручной работы. Перенесён из старого Yii2-модуля
-(`~/dockers/src/ash/modules/ceramic`, MongoDB) в самостоятельный проект.
+Магазин авторской керамики ручной работы. **Next.js 15 (App Router) + Payload 3 + Postgres.**
+Витрина и админка — в одном приложении, Payload как встроенная CMS.
 
-Ценность оригинала — **визуал**: цельная дизайн-система (CSS ~2180 строк) +
-богатая анимация на vanilla-JS (~450 строк, ноль зависимостей). Бэкенд тонкий:
-4 сущности (товары, категории, галерея, заявки), CRUD и форма заказа.
+Перенесён со старого Yii2-модуля; дизайн-система и анимации сохранены без изменений
+(см. `_visual/` — переносимый референс CSS/JS, демо-данные и старые вьюхи).
 
-## Выбор стека — в работе
+## Запуск локально
 
-Решаем между двумя связками через **два маленьких прототипа** (spike), которые
-едят один и тот же визуал из `_visual/`:
+```bash
+npm install
 
-- `spike-astro/` — **Astro + Pocketbase** (SQLite). Проще в эксплуатации,
-  топовый SEO/скорость, готовая админка Pocketbase. Ставка на «витрина + каталог
-  с админкой + заявка».
-- `spike-next/` — **Next.js 15 + Payload** (Postgres). Выше потолок: корзина,
-  оплата, аккаунты — позже без миграции. Платишь сложностью с первого дня.
+# Postgres для dev (отдельный контейнер на :5435)
+docker start ceramic-next-pg   # уже создан; либо см. docker-compose.local.yml
 
-Цель спайков — выбрать **телом, а не по таблице**: одинаковый функционал
-(страница каталога из БД + админка + форма заявки), сравниваешь DX и ощущение.
+npm run seed                   # схема + админ + демо-данные (идемпотентно)
+npm run dev                    # http://localhost:3000
+```
 
-### Оба спайка собраны и проверены ✅
+- Витрина: http://localhost:3000
+- Админка: http://localhost:3000/admin
 
-| | spike-astro | spike-next |
-|---|---|---|
-| Стек | Astro SSR + Pocketbase | Next 15 + Payload 3 + Postgres |
-| Контейнеров | 2 (web + 1 Go-бинарник) | 2 (web + Postgres) |
-| JS на витрине | ~0 (только наш ceramic.js) | ~101 kB (React-рантайм) |
-| Вес админки | отдельный бинарник | ~563 kB UI в приложении |
-| Порт витрины | :4321 | :3000 |
-| Админка | :8090/_/ | :3000/admin |
-| БД / бэкап | SQLite (файл) | Postgres (том) |
-| Сидинг | `npm run seed` | `npm run seed` (payload run) |
+`.env` задаёт `DATABASE_URI` и `PAYLOAD_SECRET`. Схема в Postgres создаётся
+автоматически (push-режим) при первом обращении Payload.
 
-Запуск каждого — см. `spike-*/README.md`. Доступ в обе админки:
-`admin@ceramic.local` / `ceramic123`.
+## Docker
+
+- `Dockerfile` — multi-stage standalone (Next `output: 'standalone'`)
+- `docker-compose.yml` — **продакшн** под Traefik (TLS/Let's Encrypt, без портов наружу)
+- `docker-compose.local.yml` — локальная проверка прод-образа без Traefik
+
+### Локально (прод-образ)
+```bash
+docker compose -f docker-compose.local.yml up --build
+# витрина http://localhost:3001 · админка http://localhost:3001/admin
+```
+
+### На VPS (Traefik)
+```bash
+cp .env.example .env          # DOMAIN, DB_PASSWORD, PAYLOAD_SECRET (openssl rand -base64 32)
+docker compose build
+docker compose up -d
+docker compose logs -f app
+```
+Подгони под свой Traefik: внешняя сеть (`proxy`), entrypoints (`web`/`websecure`),
+certresolver (`letsencrypt`) — `docker network ls` и твой `traefik.yml`.
+Первого админа заводишь на `/admin`.
+
+**Про `./uploads:/app/media`:** том под загрузку файлов, но сейчас изображения —
+внешние URL, не файлы. Пока том no-op; оживёт с upload-коллекцией `Media` (см. ниже).
 
 ## Структура
+- `src/app/(frontend)/` — витрина (главная/каталог/товар/галерея/заявка)
+- `src/app/(payload)/`  — admin UI + REST/GraphQL (boilerplate Payload)
+- `src/collections/`    — Categories / Products / Gallery / Orders / Users
+- `src/lib/data.ts`     — данные через Payload Local API (без HTTP)
+- `src/components/`      — Shell (навбар/футер), ProductCard
+- `public/css|js`        — дизайн-система и анимации
+- `scripts/seed.ts`      — сидинг через `payload run`
+- `_visual/`             — референс: исходный CSS/JS, демо-данные, старые .php-вьюхи
 
-```
-_visual/                 общий переносимый слой (источник правды по дизайну)
-  css/ceramic.css        дизайн-система — копируется в любой спайк как есть
-  js/ceramic.js          анимации — копируется как есть
-  data/seed.json         демо-данные (категории/товары/галерея)
-  DATA-MODEL.md          схема сущностей + логика-хелперы
-  markup-reference/      оригинальные .php-вьюхи как референс разметки
-spike-astro/             прототип №1   (создаётся)
-spike-next/              прототип №2   (создаётся)
-```
+## Доступы (dev/спайк — сменить для прода!)
+- Админка: `admin@ceramic.local` / `ceramic123`
 
-## Страницы (что должно быть в каждом спайке)
-
-| Маршрут            | Что          | Данные                          |
-|--------------------|--------------|---------------------------------|
-| `/`                | Главная      | featured-товары, превью, галерея|
-| `/catalog`         | Каталог      | товары + фильтр по категориям   |
-| `/catalog?category=`| фильтр      | товары категории                |
-| `/product/[slug]`  | Карточка     | товар + галерея превью          |
-| `/gallery`         | Галерея      | masonry + lightbox              |
-| `/order`           | Заявка       | форма → сохранение + уведомление|
-| `/admin`           | Админка      | CRUD (даёт CMS: Pocketbase/Payload)|
-
-## Оригинал
-Источник: `~/dockers/src/ash/modules/ceramic` (не трогаем — это бэкап-референс).
+## Дальнейшие шаги
+- Media-коллекция Payload (upload) → фото через админку, том `uploads` оживает
+- email-адаптер для уведомлений о заявках (сейчас в консоль)
+- миграции Payload вместо push-режима для контролируемых деплоев
