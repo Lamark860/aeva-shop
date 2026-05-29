@@ -18,7 +18,7 @@ docker compose -f docker-compose.dev.yml up -d
 # первый запуск БД: создать схему + админа + базовые seed
 docker compose -f docker-compose.dev.yml exec app npm run seed
 
-# залить контент aeva (нужны файлы в imports/aeva/, см. ROADMAP.md)
+# залить контент aeva (нужны файлы в imports/aeva/)
 docker compose -f docker-compose.dev.yml exec app npm run import:aeva
 ```
 
@@ -34,8 +34,8 @@ docker compose -f docker-compose.dev.yml exec app npx payload generate:importmap
 ## Прод
 
 - `Dockerfile` — multi-stage standalone (Next `output: 'standalone'`, образ ~250-350 МБ)
-- `docker-compose.yml` — **текущий прод**, single-instance под Traefik (TLS/Let's Encrypt, без портов наружу)
-- `docker-compose.prod-bg.yml` — blue/green вариант (инфра готова, ещё не задеплоена — см. ROADMAP #3)
+- `docker-compose.prod-port.yml` — **текущий прод**: single-app raw-порт `:8092`, без Traefik (домен — позже)
+- `docker-compose.yml` / `docker-compose.prod-bg.yml` — варианты под Traefik (single / blue-green) — включаются вместе с доменом
 - `docker-compose.local.yml` — локальная проверка прод-образа без Traefik (на :3001)
 
 ### На VPS (Traefik)
@@ -70,13 +70,13 @@ scripts/             — seed.ts, import-aeva.ts
 imports/aeva/        — `vases.json` / `tableware.json` / `about/delivery/contacts/hero.json`
                        + photos/{slug}/ (бэкап оригиналов для re-import; не в git)
 _visual/             — переносимый референс CSS/JS, демо-данные, старые .php-вьюхи
-design_handoff/      — макеты витрины (Mockups.html, Prototype.html, artboards/)
-design_handoff_admin/— макеты админки (AdminMockups.html, admin/*.jsx по экранам)
 ```
+> Дизайн-макеты (`design_handoff/`, `design_handoff_admin/`) — внутренняя референс-документация,
+> не в git (хранятся локально). Подробные планы — тоже во внутренней вике `_local_docs/`.
 
 ## Доступы (dev — сменить для прода!)
 - Админка: `admin@ceramic.local` / `ceramic123`
 
 ## Что дальше
-См. [ROADMAP.md](./ROADMAP.md) — что сделано и что планируется.
+Планы и состояние — во внутренней документации (`_local_docs/`, не в git).
 Подробности по архитектуре и граблям — [CLAUDE.md](./CLAUDE.md).
