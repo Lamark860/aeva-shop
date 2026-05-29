@@ -55,8 +55,11 @@ ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
 # /api/healthz возвращает 200 как только Next принимает запросы.
-# Traefik и blue-green deploy-скрипт ждут healthy перед переключением.
+# Traefik и blue-green/raw-port deploy-скрипты ждут healthy перед переключением.
+# ВАЖНО: 127.0.0.1, а НЕ localhost — busybox wget в alpine резолвит localhost в IPv6 ::1
+# первым, а Next standalone слушает только IPv4 0.0.0.0:3000 → wget на ::1 даёт
+# "Connection refused" и контейнер вечно unhealthy (хотя приложение работает).
 HEALTHCHECK --interval=10s --timeout=5s --start-period=30s --retries=5 \
-  CMD wget --quiet --spider http://localhost:3000/api/healthz || exit 1
+  CMD wget --quiet --spider http://127.0.0.1:3000/api/healthz || exit 1
 
 CMD ["node", "server.js"]
