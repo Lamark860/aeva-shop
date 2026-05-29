@@ -5,7 +5,9 @@ node_modules/
 .DS_Store
 /build
 /dist
-src/payload-types.ts
+# src/payload-types.ts — НЕ игнорируем: генерится payload generate:types, но коммитим,
+# чтобы next build (CI и прод-образ) проходил типизацию без БД/регенерации.
+# После изменения коллекций: npm run generate:types → закоммитить обновлённый файл.
 
 # загруженные через админку медиафайлы (dev)
 /media/
