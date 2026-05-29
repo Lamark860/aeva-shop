@@ -5,10 +5,10 @@ export const Categories: CollectionConfig = {
   slug: 'categories',
   admin: { useAsTitle: 'name', defaultColumns: ['name', 'slug', 'sort_order'] },
   access: { read: () => true },
-  // имя категории показывается в карточках товара (главная) и на странице товара
+  // имя категории показывается на главной, в каталоге (с фильтром по slug) и на странице товара
   hooks: {
-    afterChange: [() => { safeRevalidate('/', ['/product/[slug]', 'page']) }],
-    afterDelete: [() => { safeRevalidate('/', ['/product/[slug]', 'page']) }],
+    afterChange: [() => { safeRevalidate('/', '/catalog', ['/product/[slug]', 'page']) }],
+    afterDelete: [() => { safeRevalidate('/', '/catalog', ['/product/[slug]', 'page']) }],
   },
   fields: [
     { name: 'name', type: 'text', required: true },

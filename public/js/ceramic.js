@@ -8,18 +8,12 @@
     'use strict';
 
     // =====================================================================
-    // NAVBAR — scroll effect + mobile menu
+    // NAVBAR — mobile menu
+    // (scroll-эффект .cer-nav--scrolled теперь полностью управляется React-компонентом
+    // src/components/StickyNav.tsx — он учитывает isHero. Старый JS-handler удалён,
+    // иначе перекрывал React-классы и на inner-страницах nav становился белым
+    // при scroll-back до верха.)
     // =====================================================================
-    var nav = document.querySelector('.cer-nav');
-    if (nav) {
-        window.addEventListener('scroll', function() {
-            if (window.scrollY > 60) {
-                nav.classList.add('cer-nav--scrolled');
-            } else {
-                nav.classList.remove('cer-nav--scrolled');
-            }
-        }, { passive: true });
-    }
 
     var toggle = document.querySelector('.cer-nav__toggle');
     var navLinks = document.querySelector('.cer-nav__links');

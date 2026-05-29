@@ -7,14 +7,15 @@ export const Products: CollectionConfig = {
   labels: { singular: 'Изделие', plural: 'Изделия' },
   admin: {
     useAsTitle: 'name',
-    defaultColumns: ['name', 'category', 'price', 'featured'],
+    // photos первой — рендерится через ImageCell как миниатюра первого фото
+    defaultColumns: ['photos', 'name', 'category', 'price', 'featured'],
     description: 'Изделия каталога.',
   },
   access: { read: () => true },
-  // правки товара отражаются сразу: главная (превью + featured) и все страницы товаров
+  // правки товара отражаются сразу: главная (превью + featured), каталог и все страницы товаров
   hooks: {
-    afterChange: [() => { safeRevalidate('/', ['/product/[slug]', 'page']) }],
-    afterDelete: [() => { safeRevalidate('/', ['/product/[slug]', 'page']) }],
+    afterChange: [() => { safeRevalidate('/', '/catalog', ['/product/[slug]', 'page']) }],
+    afterDelete: [() => { safeRevalidate('/', '/catalog', ['/product/[slug]', 'page']) }],
   },
   fields: [
     {
@@ -30,6 +31,7 @@ export const Products: CollectionConfig = {
               name: 'price', type: 'number', required: true, label: 'Цена-ориентир, от (₽)',
               admin: { description: 'На сайте показывается с приставкой «от». Можно менять при разговоре с клиентом.', step: 100 },
             },
+            { name: 'inStock', type: 'checkbox', defaultValue: true, label: 'В наличии', admin: { description: 'Если снять — на сайте появится бейдж «Нет в наличии», заказ через форму всё равно возможен.' } },
             { name: 'featured', type: 'checkbox', defaultValue: false, label: 'Показывать в «Избранных» на главной', admin: { description: 'Не больше 4–5 одновременно — это лицо сайта.' } },
             { name: 'short_description', type: 'text', label: 'Короткое описание', admin: { description: '1–2 предложения, видны в карточке каталога.' } },
             { name: 'description', type: 'textarea', label: 'Характеристики', admin: { description: 'Каждая строка → отдельный пункт списка на странице товара.' } },
@@ -40,7 +42,14 @@ export const Products: CollectionConfig = {
         {
           label: 'Фотографии',
           fields: [
-            { name: 'photos', type: 'upload', relationTo: 'media', hasMany: true, label: 'Фото (загруженные)', admin: { description: 'Приоритетны. Первое — главное изображение.' } },
+            {
+              name: 'photos', type: 'upload', relationTo: 'media', hasMany: true,
+              label: 'Фото (загруженные)',
+              admin: {
+                description: 'Приоритетны. Первое — главное изображение.',
+                components: { Cell: '@/admin/ImageCell' },
+              },
+            },
             {
               name: 'images', type: 'array', label: 'Фото по URL (запасной вариант / демо)',
               labels: { singular: 'Ссылка', plural: 'Ссылки' },

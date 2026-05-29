@@ -9,6 +9,11 @@ export const HorecaInquiries: CollectionConfig = {
     useAsTitle: 'venueName',
     defaultColumns: ['venueName', 'city', 'name', 'status', 'createdAt'],
     description: 'Заявки от заведений (рестораны, кафе, бары).',
+    components: {
+      views: {
+        list: { Component: '@/admin/OrdersListView' },
+      },
+    },
   },
   access: {
     create: () => true, // публичная форма

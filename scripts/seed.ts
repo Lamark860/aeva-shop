@@ -56,5 +56,25 @@ for (const g of seed.gallery) {
 }
 console.log(`✓ gallery: +${gCount}`)
 
+// --- projects (портфолио) ---
+let prCount = 0
+for (const pr of seed.projects ?? []) {
+  if (await findOne('projects', { slug: { equals: pr.slug } })) continue
+  await payload.create({
+    collection: 'projects',
+    data: {
+      title: pr.title, slug: pr.slug, year: pr.year, type: pr.type,
+      subtitle: pr.subtitle, description: pr.description,
+      featured: !!pr.featured, sort_order: pr.sort_order ?? 0,
+      mainImage: pr.mainImage,
+      gallery: (pr.gallery ?? []).map((g: { image: string }) => ({ image: g.image })),
+      facts: pr.facts ?? [],
+      quote: pr.quote, quoteAuthor: pr.quoteAuthor,
+    },
+  })
+  prCount++
+}
+console.log(`✓ projects: +${prCount}`)
+
 console.log('\n✅ Seed готов. Админка: http://localhost:3000/admin')
 process.exit(0)

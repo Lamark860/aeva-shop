@@ -14,12 +14,19 @@ async function clientIp(): Promise<string> {
 }
 
 export async function submitOrder(formData: FormData) {
-  const name = String(formData.get('name') ?? '').trim()
-  const email = String(formData.get('email') ?? '').trim()
-  const phone = String(formData.get('phone') ?? '').trim()
-  const message = String(formData.get('message') ?? '').trim()
-  const productSlug = String(formData.get('product') ?? '').trim()
-  const honeypot = String(formData.get('website') ?? '').trim() // honeypot: люди не видят это поле
+  const get = (k: string) => String(formData.get(k) ?? '').trim()
+
+  const name = get('name')
+  const email = get('email')
+  const phone = get('phone')
+  const message = get('message')
+  const productSlug = get('product')
+  const type = get('type')
+  const purpose = get('purpose')
+  const deadline = get('deadline')
+  const budget = get('budget')
+  const referenceLink = get('referenceLink')
+  const honeypot = get('website') // honeypot: люди не видят это поле
 
   const withProduct = productSlug ? `&product=${productSlug}` : ''
 
@@ -35,6 +42,10 @@ export async function submitOrder(formData: FormData) {
     redirect('/order?error=1' + withProduct)
   }
 
-  await createOrder({ name, email, phone, message, productSlug: productSlug || undefined })
+  await createOrder({
+    name, email, phone, message,
+    productSlug: productSlug || undefined,
+    type, purpose, deadline, budget, referenceLink,
+  })
   redirect('/order?sent=1')
 }

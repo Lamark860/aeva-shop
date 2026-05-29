@@ -28,5 +28,74 @@
     { "title": "Руки мастера",     "image": "https://images.unsplash.com/photo-1556909114-44e3e70034e2?w=400&h=600&fit=crop", "size": "tall",   "sort_order": 6 },
     { "title": "Инструменты",      "image": "https://images.unsplash.com/photo-1602028915047-37269d1a73f7?w=600&h=400&fit=crop", "size": "wide",   "sort_order": 7 },
     { "title": "Обжиг",            "image": "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=400&h=400&fit=crop", "size": "normal", "sort_order": 8 }
+  ],
+  "projects": [
+    {
+      "title": "Norra · посуда для тейстинга",
+      "slug": "norra",
+      "year": "2026",
+      "type": "restaurant",
+      "subtitle": "42 предмета · матовый шамот · сет из 6 форм",
+      "description": "Шеф искал посуду, которая не отвлекает от блюда, но и не растворяется в нём. Сделали восемь эскизов, шесть прототипов и четыре полных тестовых сета на реальном меню — пока форма не стала частью подачи, а не фоном.",
+      "featured": true,
+      "sort_order": 0,
+      "mainImage": "https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=1600&h=1067&fit=crop&q=80",
+      "gallery": [
+        { "image": "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=900&h=900&fit=crop&q=80" },
+        { "image": "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=900&h=900&fit=crop&q=80" },
+        { "image": "https://images.unsplash.com/photo-1612196808214-b8e1d6145a8c?w=900&h=900&fit=crop&q=80" },
+        { "image": "https://images.unsplash.com/photo-1493106641515-6b5631de4bb9?w=900&h=900&fit=crop&q=80" }
+      ],
+      "facts": [
+        { "key": "Заведение", "value": "Norra, Санкт-Петербург" },
+        { "key": "Объём", "value": "42 предмета" },
+        { "key": "Материал", "value": "Матовый шамот" },
+        { "key": "Срок", "value": "3 месяца" }
+      ],
+      "quote": "Гости стали фотографировать не только блюдо, но и тарелку. Для нас это значит, что посуда стала частью истории.",
+      "quoteAuthor": "Шеф-повар, Norra"
+    },
+    {
+      "title": "Тихое утро · коллекция для дома",
+      "slug": "tihoe-utro",
+      "year": "2025",
+      "type": "collection",
+      "subtitle": "Капсульная коллекция · 12 форм · тёплая глазурь",
+      "description": "Авторская коллекция из двенадцати предметов для медленных завтраков: кружки, пиалы, тарелки и кувшин. Единая палитра тёплых земляных тонов, которая собирается в цельный сервиз.",
+      "featured": true,
+      "sort_order": 1,
+      "mainImage": "https://images.unsplash.com/photo-1556909114-44e3e70034e2?w=1600&h=1067&fit=crop&q=80",
+      "gallery": [
+        { "image": "https://images.unsplash.com/photo-1610701596061-2ecf227e85b2?w=900&h=900&fit=crop&q=80" },
+        { "image": "https://images.unsplash.com/photo-1602028915047-37269d1a73f7?w=900&h=900&fit=crop&q=80" }
+      ],
+      "facts": [
+        { "key": "Тип", "value": "Капсульная коллекция" },
+        { "key": "Предметов", "value": "12 форм" },
+        { "key": "Финиш", "value": "Тёплая матовая глазурь" }
+      ],
+      "quote": "Хотелось, чтобы вещи не кричали, а просто были рядом каждое утро.",
+      "quoteAuthor": "Из заметок мастерской"
+    },
+    {
+      "title": "Семейный сервиз на заказ",
+      "slug": "semeyniy-serviz",
+      "year": "2025",
+      "type": "private",
+      "subtitle": "Частный заказ · 24 предмета · персональное клеймо",
+      "description": "Сервиз для большой семьи: тарелки трёх размеров, чаши и блюда для подачи. На каждом предмете — небольшое персональное клеймо по эскизу заказчика.",
+      "featured": false,
+      "sort_order": 2,
+      "mainImage": "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=1600&h=1067&fit=crop&q=80",
+      "gallery": [
+        { "image": "https://images.unsplash.com/photo-1556909114-44e3e70034e2?w=900&h=900&fit=crop&q=80" },
+        { "image": "https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=900&h=900&fit=crop&q=80" }
+      ],
+      "facts": [
+        { "key": "Тип", "value": "Частный заказ" },
+        { "key": "Объём", "value": "24 предмета" },
+        { "key": "Особенность", "value": "Персональное клеймо" }
+      ]
+    }
   ]
 }

@@ -1,62 +1,85 @@
 import React from 'react'
+import StickyNav from './StickyNav'
 
 const links = [
-  { href: '/', label: 'Главная', id: 'home' },
   { href: '/catalog', label: 'Каталог', id: 'catalog' },
+  { href: '/projects', label: 'Проекты', id: 'projects' },
   { href: '/gallery', label: 'Галерея', id: 'gallery' },
+  { href: '/horeca', label: 'Ресторанам', id: 'horeca' },
   { href: '/order', label: 'На заказ', id: 'order' },
+  { href: '/about', label: 'О мастере', id: 'about' },
+]
+
+// Колонки футера — «3 трека» из ТЗ.
+const footerCols: { title: string; items: { href: string; label: string }[] }[] = [
+  {
+    title: 'Частным',
+    items: [
+      { href: '/catalog', label: 'Каталог' },
+      { href: '/gallery', label: 'Галерея' },
+      { href: '/order', label: 'Индивидуальный заказ' },
+      { href: '/care', label: 'Уход' },
+    ],
+  },
+  {
+    title: 'Ресторанам',
+    items: [
+      { href: '/horeca', label: 'Услуги' },
+      { href: '/projects', label: 'Кейсы' },
+      { href: '/horeca#contact', label: 'Связаться' },
+    ],
+  },
+  {
+    title: 'Студия',
+    items: [
+      { href: '/about', label: 'О мастере' },
+      { href: '/projects', label: 'Проекты' },
+      { href: '/journal', label: 'Дневник' },
+      { href: '/pages/delivery', label: 'Доставка' },
+      { href: '/pages/contacts', label: 'Контакты' },
+    ],
+  },
 ]
 
 export default function Shell({
   children, active = '', isHero = false,
 }: { children: React.ReactNode; active?: string; isHero?: boolean }) {
-  const navClass = 'cer-nav' + (isHero ? '' : ' cer-nav--inner')
   return (
     <>
-      <nav className={navClass}>
-        <div className="cer-nav__inner">
-          <a href="/" className="cer-nav__brand">Керамика</a>
-          <button className="cer-nav__toggle" aria-label="Меню"><span></span><span></span><span></span></button>
-          <ul className="cer-nav__links">
-            {links.map((l) => (
-              <li key={l.id}>
-                <a href={l.href} className={`cer-nav__link ${active === l.id ? 'cer-nav__link--active' : ''}`}>{l.label}</a>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </nav>
+      <StickyNav active={active} isHero={isHero} links={links} />
 
       {children}
 
-      <footer className="cer-footer">
-        <div className="cer-container">
-          <div className="cer-footer__inner">
+      <footer className="cer-footer-v2">
+        <div className="cer-footer-v2__inner">
+          <div className="cer-footer-v2__cols">
             <div>
-              <div className="cer-footer__brand">Керамика</div>
-              <p>Авторская керамика<br />ручной работы</p>
+              <div className="cer-footer-v2__brand">Керамика</div>
+              <p className="cer-footer-v2__tagline">
+                Авторская керамика ручной работы. Штучные изделия и партии посуды для ресторанов.
+              </p>
             </div>
-            <div>
-              <div className="cer-footer__heading">Навигация</div>
-              <ul className="cer-footer__links">
-                <li><a href="/">Главная</a></li>
-                <li><a href="/catalog">Каталог</a></li>
-                <li><a href="/gallery">Галерея</a></li>
-                <li><a href="/order">Индивидуальный заказ</a></li>
-              </ul>
-            </div>
-            <div>
-              <div className="cer-footer__heading">Контакты</div>
-              <ul className="cer-footer__links">
-                <li>hello@ceramic-studio.ru</li>
-                <li>+7 (999) 123-45-67</li>
-              </ul>
-              <div className="cer-footer__socials">
-                <a href="#">Instagram</a><a href="#">Telegram</a><a href="#">VK</a>
+            {footerCols.map((col) => (
+              <div key={col.title}>
+                <div className="cer-footer-v2__col-title">{col.title}</div>
+                <ul className="cer-footer-v2__list">
+                  {col.items.map((it) => (
+                    <li key={it.href + it.label}>
+                      <a href={it.href}>{it.label}</a>
+                    </li>
+                  ))}
+                </ul>
               </div>
+            ))}
+          </div>
+          <div className="cer-footer-v2__copy">
+            <div>© {new Date().getFullYear()} Керамика · Все изделия выполнены вручную</div>
+            <div className="cer-footer-v2__socials">
+              <a href="https://www.instagram.com/aeva.alina" target="_blank" rel="noopener noreferrer">Instagram</a>
+              <a href="https://t.me/aeva_alina" target="_blank" rel="noopener noreferrer">Telegram</a>
+              <a href="https://wa.me/79033642827" target="_blank" rel="noopener noreferrer">WhatsApp</a>
             </div>
           </div>
-          <div className="cer-footer__copy">&copy; {new Date().getFullYear()} Керамика. Все изделия выполнены вручную.</div>
         </div>
       </footer>
     </>

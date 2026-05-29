@@ -13,3 +13,10 @@ src/payload-types.ts
 
 # build artifact
 *.tsbuildinfo
+
+# рабочие скриншоты dev-проверок (генерятся через chrome-devtools MCP)
+/screenshots/
+
+# импорт-кэш с shop-aeva.ru (~170МБ оригиналов фото + JSON) — локальный «бэкап» для re-import.
+# В git не пускаем; для нового VPS достаточно `npm run import:aeva` если положить эти файлы рядом.
+/imports/

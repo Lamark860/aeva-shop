@@ -8,6 +8,11 @@ export const Orders: CollectionConfig = {
     useAsTitle: 'name',
     defaultColumns: ['name', 'email', 'type', 'status', 'createdAt'],
     description: 'Заявки на индивидуальный заказ с формы сайта.',
+    components: {
+      views: {
+        list: { Component: '@/admin/OrdersListView' },
+      },
+    },
   },
   access: {
     create: () => true, // форма заявки — публичная

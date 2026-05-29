@@ -8,7 +8,11 @@
     "build": "next build",
     "start": "next start",
     "generate:types": "payload generate:types",
-    "seed": "payload run scripts/seed.ts"
+    "seed": "payload run scripts/seed.ts",
+    "import:aeva": "payload run scripts/import-aeva.ts",
+    "cleanup:dummy": "payload run scripts/cleanup-dummy.ts",
+    "seed:globals": "payload run scripts/seed-globals.ts",
+    "feature:vases": "payload run scripts/feature-vases.ts"
   },
   "dependencies": {
     "@payloadcms/db-postgres": "3.84.1",

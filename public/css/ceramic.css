@@ -541,7 +541,12 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 60px;
-    align-items: center;
+    align-items: start;
+}
+/* sticky-портрет следует за скроллом текста (на about правая колонка длинная,
+   с align-items:center фото уезжало в центр и оказывалось ниже viewport) */
+@media (min-width: 769px) {
+    .cer-two-col__image { position: sticky; top: 100px; }
 }
 
 .cer-two-col__image img {
@@ -2226,3 +2231,1033 @@
     @page { margin: 1.5cm; }
 }
 
+/* ============================================================
+   Проекты (портфолио): /projects и /projects/[slug]
+   Использует существующие токены --cer-*. Скролл-фейд —
+   через cer-fade-* (IntersectionObserver в ceramic.js).
+   ============================================================ */
+
+/* ---------- Список /projects ---------- */
+.cer-projects {
+    display: flex;
+    flex-direction: column;
+}
+.cer-project-row {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 64px;
+    align-items: center;
+    padding: 72px 0;
+    border-top: 1px solid var(--cer-border);
+    text-decoration: none;
+    color: inherit;
+}
+.cer-project-row:last-child {
+    border-bottom: 1px solid var(--cer-border);
+}
+.cer-project-row--reverse .cer-project-row__media { order: 1; }
+.cer-project-row--reverse .cer-project-row__body { order: 0; }
+.cer-project-row__media {
+    overflow: hidden;
+    border-radius: var(--cer-radius);
+}
+.cer-project-row__img {
+    width: 100%;
+    aspect-ratio: 3 / 2;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.cer-project-row:hover .cer-project-row__img { transform: scale(1.04); }
+.cer-project-row__meta {
+    display: flex;
+    gap: 16px;
+    font-size: 0.6875rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--cer-accent);
+    margin-bottom: 18px;
+}
+.cer-project-row__meta span:not(:first-child) { color: var(--cer-text-light); }
+.cer-project-row__title {
+    font-family: var(--cer-font-heading);
+    font-size: clamp(1.75rem, 3vw, 2.5rem);
+    font-weight: 400;
+    line-height: 1.1;
+    margin: 0 0 8px;
+    color: var(--cer-text);
+}
+.cer-project-row__subtitle {
+    font-size: 0.875rem;
+    color: var(--cer-text-light);
+    margin-bottom: 18px;
+}
+.cer-project-row__desc {
+    font-size: 1rem;
+    line-height: 1.75;
+    color: var(--cer-text-muted);
+    margin: 0 0 24px;
+    max-width: 460px;
+}
+.cer-project-row__more {
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--cer-accent);
+    border-bottom: 1px solid var(--cer-accent);
+    padding-bottom: 3px;
+    font-weight: 500;
+}
+
+/* ---------- Детальная /projects/[slug] ---------- */
+.cer-project-hero {
+    position: relative;
+    height: 75vh;
+    min-height: 560px;
+    overflow: hidden;
+    background: #1a1612;
+}
+.cer-project-hero__bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+}
+.cer-project-hero__bg img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    animation: cerKenBurns 22s ease-out infinite alternate;
+}
+.cer-project-hero__overlay {
+    position: absolute;
+    inset: 0;
+    /* двухслойный overlay: ровный «тёмный фильтр» + лёгкий нижний градиент.
+       0.55 ровно по всей высоте гарантирует читаемость на любом фото и любой высоте viewport. */
+    background:
+        linear-gradient(to bottom, rgba(0, 0, 0, 0.55) 0%, rgba(26, 22, 18, 0.85) 100%),
+        rgba(0, 0, 0, 0.35);
+    z-index: 1;
+}
+.cer-project-hero__content {
+    position: relative;
+    z-index: 2;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding-bottom: 80px;
+    color: var(--cer-white);
+}
+.cer-project-hero__meta {
+    display: flex;
+    gap: 16px;
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 16px;
+}
+/* selector — двойной класс, чтобы перебить более специфичное .cer-page h1 (color: --cer-text) */
+.cer-project-hero h1.cer-project-hero__title,
+.cer-project-hero__title {
+    font-family: var(--cer-font-heading);
+    font-size: clamp(3rem, 7vw, 6rem);
+    font-weight: 400;
+    line-height: 1.05;
+    color: var(--cer-white);
+    margin: 0;
+    max-width: 900px;
+    text-shadow: 0 2px 16px rgba(0, 0, 0, 0.5);
+}
+
+@keyframes cerKenBurns {
+    from { transform: scale(1) translate(0, 0); }
+    to   { transform: scale(1.12) translate(-1.5%, -1.5%); }
+}
+
+/* Полоса фактов */
+.cer-facts {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    gap: 40px;
+}
+.cer-fact__key {
+    font-size: 0.6875rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--cer-text-light);
+    margin-bottom: 10px;
+}
+.cer-fact__value {
+    font-family: var(--cer-font-heading);
+    font-size: 1.25rem;
+    line-height: 1.35;
+    color: var(--cer-text);
+}
+
+/* Описание */
+.cer-project-story {
+    max-width: 760px;
+    margin: 0 auto;
+}
+.cer-project-story h2 {
+    margin: 8px 0 32px;
+}
+.cer-project-story p {
+    font-size: 1.125rem;
+    line-height: 1.85;
+    color: var(--cer-text-muted);
+    margin: 0;
+    white-space: pre-line;
+}
+
+/* Галерея проекта */
+.cer-project-gallery {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+.cer-project-gallery__item {
+    overflow: hidden;
+    border-radius: var(--cer-radius);
+}
+.cer-project-gallery__item img {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.cer-project-gallery__item:hover img { transform: scale(1.04); }
+
+/* Цитата (тёмная секция) */
+.cer-project-quote {
+    background: var(--cer-text);
+    color: var(--cer-white);
+    text-align: center;
+}
+.cer-project-quote__text {
+    font-family: var(--cer-font-heading);
+    font-size: clamp(1.5rem, 2.6vw, 2.125rem);
+    font-weight: 400;
+    line-height: 1.4;
+    color: var(--cer-white);
+    margin: 0 auto;
+    max-width: 900px;
+}
+.cer-project-quote__author {
+    margin-top: 32px;
+    font-size: 0.75rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+@media (max-width: 768px) {
+    .cer-project-row,
+    .cer-project-gallery,
+    .cer-facts {
+        grid-template-columns: 1fr;
+    }
+    .cer-project-row {
+        gap: 28px;
+        padding: 48px 0;
+    }
+    .cer-project-row--reverse .cer-project-row__media,
+    .cer-project-row--reverse .cer-project-row__body { order: initial; }
+    .cer-facts {
+        grid-auto-flow: row;
+        gap: 28px;
+    }
+    .cer-project-hero { height: 60vh; min-height: 420px; }
+    .cer-project-hero__content { padding-bottom: 48px; }
+}
+
+/* ============================================================
+   HoReCa (B2B): /horeca
+   Тёмный hero переиспользует .cer-project-hero* с модификатором
+   центрирования. Форма — на базе .cer-order.
+   ============================================================ */
+
+/* Hero: вертикальное центрирование + подзаголовок и кнопка */
+.cer-project-hero--center .cer-project-hero__content {
+    justify-content: center;
+    padding-bottom: 0;
+}
+/* На мобиле title переходит на 4 строки, meta уползает наверх и пересекается
+   с nav-логотипом. Добавляем safe-zone сверху. */
+@media (max-width: 640px) {
+    .cer-project-hero--center .cer-project-hero__content {
+        padding-top: 100px;
+    }
+}
+.cer-project-hero p.cer-project-hero__lead,
+.cer-project-hero__lead {
+    font-size: 1.125rem;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.9);
+    max-width: 620px;
+    margin: 24px 0 36px;
+    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.45);
+}
+
+/* Метрики */
+.cer-metrics {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 40px;
+}
+.cer-metric__value {
+    font-family: var(--cer-font-heading);
+    font-size: clamp(2.25rem, 4vw, 3.25rem);
+    color: var(--cer-accent);
+    line-height: 1;
+    margin-bottom: 10px;
+}
+.cer-metric__label {
+    font-size: 0.875rem;
+    color: var(--cer-text-muted);
+}
+
+/* Кейсы (карточки проектов 4:5) */
+.cer-cases {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+.cer-case {
+    text-decoration: none;
+    color: var(--cer-text);
+    display: block;
+}
+.cer-case__img-wrap {
+    overflow: hidden;
+    margin-bottom: 20px;
+    border-radius: var(--cer-radius);
+}
+.cer-case__img {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.cer-case:hover .cer-case__img { transform: scale(1.04); }
+.cer-case__meta {
+    font-size: 0.6875rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--cer-accent);
+    margin-bottom: 8px;
+}
+.cer-case__title {
+    font-family: var(--cer-font-heading);
+    font-size: 1.375rem;
+    font-weight: 400;
+    margin: 0 0 8px;
+    color: var(--cer-text);
+}
+.cer-case__note {
+    font-size: 0.875rem;
+    color: var(--cer-text-muted);
+}
+
+/* Шаги процесса */
+.cer-steps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 32px;
+}
+.cer-step__num {
+    font-family: var(--cer-font-heading);
+    font-size: 1.5rem;
+    color: var(--cer-accent);
+    margin-bottom: 16px;
+}
+.cer-step__title {
+    font-family: var(--cer-font-heading);
+    font-size: 1.375rem;
+    font-weight: 400;
+    margin: 0 0 12px;
+    color: var(--cer-text);
+}
+.cer-step__text {
+    font-size: 0.875rem;
+    line-height: 1.7;
+    color: var(--cer-text-muted);
+    margin: 0;
+}
+
+/* Расширения формы (.cer-order) для HoReCa */
+.cer-order--wide {
+    max-width: 720px;
+}
+.cer-order select {
+    width: 100%;
+    padding: 12px 16px;
+    font-family: var(--cer-font-body);
+    font-size: 0.9375rem;
+    border: 1px solid var(--cer-bg-muted);
+    background-color: var(--cer-white);
+    color: var(--cer-text);
+    transition: border-color var(--cer-transition-fast);
+    outline: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%237A726C' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    cursor: pointer;
+}
+.cer-order select:focus { border-color: var(--cer-accent); }
+.cer-order__row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+}
+
+@media (max-width: 768px) {
+    .cer-metrics { grid-template-columns: repeat(2, 1fr); }
+    .cer-cases { grid-template-columns: 1fr; }
+    .cer-steps { grid-template-columns: 1fr 1fr; }
+    .cer-order__row { grid-template-columns: 1fr; }
+}
+
+
+/* ============================================================
+   FX — анимации и доп. блоки нового дизайна (Hero V3 + страницы)
+   Эта секция парная с компонентами src/components/fx/* и
+   стилевыми классами в page.tsx новых страниц.
+   ============================================================ */
+
+/* Scroll-fade — базовый «появляется снизу» */
+.fx-fade {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 900ms cubic-bezier(0.16, 1, 0.3, 1),
+              transform 900ms cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+.fx-fade.is-visible { opacity: 1; transform: translateY(0); }
+
+/* Reveal-маска — текст «выезжает» снизу из-под обрезающей полосы.
+   padding-bottom — место под descender («у», «р», «д»), иначе overflow:hidden
+   срезает хвосты букв даже после завершения анимации. */
+.fx-reveal-mask {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  padding-bottom: 0.18em;
+}
+.fx-reveal-mask .fx-reveal-inner {
+  display: inline-block;
+  /* выезжает на полную высоту маски (с учётом padding), иначе descender видно с самого старта */
+  transform: translateY(calc(100% + 0.18em));
+  transition: transform 1100ms cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+.fx-reveal-mask.is-visible .fx-reveal-inner { transform: translateY(0); }
+
+/* Ken-burns — медленный zoom-pan фоновой фотографии */
+@keyframes cerKenBurns {
+  0%   { transform: scale(1)    translate(0, 0); }
+  100% { transform: scale(1.12) translate(-1.5%, -1%); }
+}
+.fx-kenburns {
+  animation: cerKenBurns 22s cubic-bezier(0.4, 0, 0.6, 1) both;
+  will-change: transform;
+}
+
+/* Page transition fallback (если нет View Transitions API) */
+@keyframes cerPageIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* View Transitions (Chromium/Safari TP) */
+@view-transition { navigation: auto; }
+::view-transition-old(root) {
+  animation: 360ms cubic-bezier(0.22, 1, 0.36, 1) both cerVtOut;
+}
+::view-transition-new(root) {
+  animation: 560ms cubic-bezier(0.16, 1, 0.3, 1) 60ms both cerVtIn;
+}
+@keyframes cerVtOut { to { opacity: 0; } }
+@keyframes cerVtIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================================
+   Home Hero V3 — тёмный full-screen
+   ============================================================ */
+.cer-hero-v3 {
+  position: relative;
+  height: 100vh;
+  min-height: 720px;
+  overflow: hidden;
+  background: #1a1612;
+  color: #fff;
+}
+.cer-hero-v3__bg { position: absolute; inset: 0; overflow: hidden; }
+.cer-hero-v3__bg img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.cer-hero-v3__overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.55) 100%);
+}
+.cer-hero-v3__content {
+  position: relative; z-index: 2; height: 100%;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; text-align: center;
+  padding: 0 56px; color: #fff;
+}
+/* Двойной селектор перебивает .cer-page h1 { color: var(--cer-text) } */
+.cer-hero-v3 h1.cer-hero-v3__title,
+.cer-hero-v3__title {
+  font-family: var(--cer-font-heading);
+  font-size: clamp(56px, 7vw, 96px);
+  font-weight: 400;
+  line-height: 1.05;
+  color: #fff;
+  margin: 0;
+  letter-spacing: -0.015em;
+}
+/* двойной селектор перебивает .cer-page p (0,1,1), иначе lead становится тёмным
+   на тёмном overlay — невидимым. Та же грабля что с .cer-hero-v3__title */
+.cer-hero-v3 p.cer-hero-v3__lead,
+.cer-hero-v3__lead {
+  font-size: 18px;
+  color: rgba(255,255,255,0.92);
+  max-width: 560px;
+  margin: 0;
+  line-height: 1.6;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.45);
+}
+.cer-hero-v3__lead-wrap { margin-top: 32px; overflow: hidden; }
+.cer-hero-v3__scroll {
+  position: absolute; bottom: 40px; left: 50%;
+  transform: translateX(-50%);
+  color: rgba(255,255,255,0.6);
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  z-index: 2;
+  animation: cerHeroBob 2.4s ease-in-out infinite;
+}
+@keyframes cerHeroBob {
+  0%, 100% { transform: translate(-50%, 0);  opacity: 0.6; }
+  50%      { transform: translate(-50%, 8px); opacity: 1; }
+}
+
+/* ============================================================
+   Routing strip — три карточки под hero
+   ============================================================ */
+.cer-routing {
+  background: var(--cer-bg);
+  padding: 80px 56px;
+}
+.cer-routing__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.cer-routing__card {
+  display: block;
+  text-decoration: none;
+  color: var(--cer-text);
+  background: #fff;
+  border: 1px solid var(--cer-border);
+  padding: 32px 32px 36px;
+  transition: transform 600ms cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 400ms cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+.cer-routing__card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.06);
+}
+.cer-routing__card--dark {
+  background: var(--cer-text);
+  color: #fff;
+  border-color: transparent;
+}
+.cer-routing__eyebrow {
+  display: inline-block;
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--cer-accent);
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+.cer-routing__card--dark .cer-routing__eyebrow { color: rgba(255,255,255,0.6); }
+.cer-routing__title {
+  font-family: var(--cer-font-heading);
+  font-size: 36px;
+  font-weight: 400;
+  margin: 4px 0 14px;
+  color: inherit;
+}
+.cer-routing__desc {
+  font-size: 15px;
+  color: var(--cer-text-muted);
+  margin: 0 0 28px;
+  line-height: 1.6;
+  min-height: 48px;
+}
+.cer-routing__card--dark p.cer-routing__desc,
+.cer-routing__card--dark .cer-routing__desc { color: rgba(255,255,255,0.7); }
+/* перебиваем .cer-page h3 (специфичность 0,1,1) для тёмной карточки */
+.cer-routing__card--dark h3.cer-routing__title { color: #fff; }
+.cer-routing__cta {
+  font-size: 12px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--cer-accent);
+  font-weight: 500;
+}
+.cer-routing__card--dark .cer-routing__cta { color: #fff; }
+
+/* ============================================================
+   Sticky nav — transparent → cream/blur
+   ============================================================ */
+.cer-nav.cer-nav--sticky {
+  position: fixed; top: 0; left: 0; right: 0;
+  z-index: 100;
+  background: rgba(246, 243, 239, 0.85);
+  backdrop-filter: saturate(150%) blur(14px);
+  -webkit-backdrop-filter: saturate(150%) blur(14px);
+  box-shadow: 0 1px 0 rgba(0,0,0,0.04);
+  transition: padding 400ms cubic-bezier(0.16, 1, 0.3, 1),
+              background 300ms ease,
+              color 250ms ease,
+              box-shadow 300ms ease;
+}
+.cer-nav.cer-nav--transparent {
+  background: transparent;
+  backdrop-filter: none; -webkit-backdrop-filter: none;
+  box-shadow: none;
+  color: rgba(255,255,255,0.95);
+}
+.cer-nav.cer-nav--transparent .cer-nav__brand,
+.cer-nav.cer-nav--transparent .cer-nav__link { color: rgba(255,255,255,0.95); }
+.cer-nav.cer-nav--transparent .cer-nav__link--active { border-bottom-color: rgba(255,255,255,0.95); }
+
+/* ============================================================
+   Product page V2 — sticky CTA + specs + related
+   ============================================================ */
+.cer-product-v2 {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 64px;
+  align-items: start;
+}
+.cer-product-v2__info { position: sticky; top: 96px; align-self: start; }
+.cer-product-v2__price-row {
+  display: flex; align-items: baseline; gap: 10px; margin-bottom: 32px;
+}
+.cer-product-v2__price-label {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--cer-text-light);
+}
+.cer-product-v2__price {
+  font-family: var(--cer-font-heading);
+  font-size: 28px;
+  color: var(--cer-text);
+}
+.cer-product-v2__intro {
+  font-size: 16px;
+  line-height: 1.75;
+  color: var(--cer-text-muted);
+  margin: 0 0 32px;
+}
+.cer-product-v2__features {
+  list-style: none; padding: 0; margin: 0 0 32px;
+  border-top: 1px solid var(--cer-border);
+}
+.cer-product-v2__features li {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--cer-border);
+  font-size: 15px;
+  color: var(--cer-text);
+  display: flex; align-items: center; gap: 14px;
+}
+.cer-product-v2__features li::before {
+  content: ''; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--cer-accent); flex: 0 0 6px;
+}
+.cer-product-v2__hint {
+  font-size: 13px;
+  color: var(--cer-text-light);
+  margin-top: 20px;
+  line-height: 1.6;
+}
+.cer-product-v2__thumbs {
+  display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap;
+}
+.cer-product-v2__thumb {
+  width: 80px; height: 80px;
+  border: 1px solid var(--cer-border);
+  padding: 0; background: transparent;
+  opacity: 0.6;
+  transition: opacity 250ms ease, border-color 250ms ease;
+  cursor: pointer;
+}
+.cer-product-v2__thumb--active {
+  border-color: var(--cer-accent); opacity: 1;
+}
+.cer-product-v2__thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.cer-specs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.cer-spec__label {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--cer-accent);
+  margin-bottom: 20px;
+  font-weight: 500;
+}
+.cer-spec__rows { margin: 0; }
+.cer-spec__row {
+  display: flex; justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--cer-border);
+  font-size: 14px;
+}
+.cer-spec__row dt { color: var(--cer-text-light); margin: 0; }
+.cer-spec__row dd { color: var(--cer-text); margin: 0; }
+.cer-spec__body {
+  font-size: 14px; line-height: 1.75;
+  color: var(--cer-text-muted);
+  margin: 0;
+}
+.cer-spec__body--with-rows { margin-top: 20px; }
+
+/* ============================================================
+   Footer V2 — три «трека»
+   ============================================================ */
+.cer-footer-v2 {
+  background: var(--cer-text);
+  color: rgba(255,255,255,0.85);
+  padding: 80px 56px 32px;
+}
+.cer-footer-v2__inner { max-width: 1200px; margin: 0 auto; }
+.cer-footer-v2__cols {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 48px;
+  padding-bottom: 48px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.cer-footer-v2__brand {
+  font-family: var(--cer-font-heading);
+  font-size: 26px;
+  color: #fff;
+  margin-bottom: 14px;
+}
+.cer-footer-v2__tagline {
+  font-size: 14px;
+  line-height: 1.7;
+  color: rgba(255,255,255,0.6);
+  max-width: 320px;
+  margin: 0;
+}
+.cer-footer-v2__col-title {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--cer-accent);
+  margin-bottom: 18px;
+}
+.cer-footer-v2__list { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+.cer-footer-v2__list a { font-size: 14px; color: rgba(255,255,255,0.7); text-decoration: none; }
+.cer-footer-v2__list a:hover { color: rgba(255,255,255,1); }
+.cer-footer-v2__copy {
+  display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px;
+  padding-top: 28px;
+  font-size: 12px;
+  color: rgba(255,255,255,0.45);
+  letter-spacing: 0.05em;
+}
+.cer-footer-v2__socials { display: flex; gap: 24px; }
+.cer-footer-v2__socials a { color: rgba(255,255,255,0.7); text-decoration: none; }
+
+/* ============================================================
+   ProductCard — caption «от» и подпись
+   ============================================================ */
+.cer-card__price-row {
+  display: flex; flex-direction: column; gap: 4px; margin-top: 6px;
+}
+.cer-card__price-hint {
+  font-size: 11px;
+  color: var(--cer-text-light);
+  letter-spacing: 0.06em;
+}
+
+/* ============================================================
+   Catalog — сортировка
+   ============================================================ */
+.cer-catalog__toolbar {
+  display: flex; justify-content: space-between; align-items: center; gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+.cer-catalog__count {
+  font-size: 13px;
+  color: var(--cer-text-muted);
+  letter-spacing: 0.04em;
+}
+.cer-sort {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 13px; color: var(--cer-text-muted);
+}
+.cer-sort select {
+  padding: 8px 32px 8px 12px;
+  font-family: var(--cer-font-body);
+  font-size: 13px;
+  border: 1px solid var(--cer-border);
+  background-color: #fff;
+  color: var(--cer-text);
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%237A726C' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  cursor: pointer;
+}
+
+/* ============================================================
+   Care / Journal / About — простые секции
+   ============================================================ */
+.cer-numbered {
+  max-width: 760px;
+  margin: 0 auto;
+}
+.cer-numbered__item {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: 32px;
+  padding: 36px 0;
+  border-top: 1px solid var(--cer-border);
+}
+.cer-numbered__num {
+  font-family: var(--cer-font-heading);
+  font-size: 24px;
+  color: var(--cer-accent);
+}
+.cer-numbered__title {
+  font-family: var(--cer-font-heading);
+  font-size: 24px;
+  font-weight: 400;
+  margin: 0 0 10px;
+  color: var(--cer-text);
+}
+.cer-numbered__text {
+  font-size: 16px;
+  line-height: 1.75;
+  color: var(--cer-text-muted);
+  margin: 0;
+}
+
+.cer-subscribe {
+  display: flex; gap: 12px; align-items: stretch;
+  max-width: 560px; margin: 0 auto;
+}
+.cer-subscribe input[type="email"] {
+  flex: 1;
+  padding: 14px 18px;
+  border: 1px solid var(--cer-border);
+  background: #fff;
+  font-family: var(--cer-font-body);
+  font-size: 15px;
+}
+.cer-subscribe__hint {
+  font-size: 13px;
+  color: var(--cer-text-light);
+  margin-top: 14px;
+  text-align: center;
+}
+
+.cer-journal-letter {
+  background: #fff;
+  padding: 56px 64px;
+  border: 1px solid var(--cer-border);
+  max-width: 720px;
+  margin: 0 auto;
+}
+.cer-journal-letter__meta {
+  font-size: 12px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--cer-text-light);
+  margin-bottom: 20px;
+}
+.cer-journal-letter__title {
+  font-family: var(--cer-font-heading);
+  font-size: clamp(24px, 3vw, 36px);
+  font-weight: 400;
+  line-height: 1.1;
+  margin: 0 0 28px;
+  color: var(--cer-text);
+}
+.cer-journal-letter__sign {
+  font-family: var(--cer-font-heading);
+  font-size: 28px;
+  color: var(--cer-accent);
+  font-style: italic;
+  opacity: 0.6;
+  margin-top: 24px;
+}
+
+/* About */
+.cer-about-quote {
+  background: var(--cer-bg-alt);
+  padding: 120px 56px;
+  text-align: center;
+}
+.cer-about-quote p {
+  font-family: var(--cer-font-heading);
+  font-size: clamp(28px, 3.6vw, 44px);
+  font-weight: 400;
+  line-height: 1.35;
+  color: var(--cer-text);
+  margin: 0 auto;
+  max-width: 900px;
+  letter-spacing: -0.005em;
+}
+.cer-about-triptych {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+.cer-about-triptych > div { overflow: hidden; }
+.cer-about-triptych img { width: 100%; display: block; aspect-ratio: 3/4; object-fit: cover; }
+
+/* ============================================================
+   Print stylesheet — для печати страницы товара
+   ============================================================ */
+@media print {
+  .cer-nav, .cer-footer, .cer-footer-v2, .cer-routing,
+  .cer-cta, .cer-atmospheric, .cer-section--no-print { display: none !important; }
+  body { background: #fff; color: #000; }
+  a { color: #000; text-decoration: none; }
+  .cer-product-v2 { display: block !important; }
+  .cer-product-v2__info { position: static !important; }
+  .cer-btn { display: none !important; }
+  .cer-product-v2__features li { break-inside: avoid; }
+  img { max-width: 100%; height: auto; }
+  .cer-specs { display: block; }
+  .cer-specs > div { margin-bottom: 24px; break-inside: avoid; }
+}
+
+/* ============================================================
+   prefers-reduced-motion — выключаем все анимации
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  .fx-fade { opacity: 1 !important; transform: none !important; transition: none !important; }
+  .fx-reveal-mask .fx-reveal-inner { transform: none !important; transition: none !important; }
+  .fx-kenburns { animation: none !important; }
+  .cer-routing__card:hover { transform: none; box-shadow: none; }
+  ::view-transition-old(root), ::view-transition-new(root) { animation: none !important; }
+}
+
+/* ============================================================
+   Адаптив новых блоков
+   ============================================================ */
+@media (max-width: 900px) {
+  .cer-routing { padding: 56px 24px; }
+  .cer-routing__grid { grid-template-columns: 1fr; gap: 16px; }
+  .cer-product-v2 { grid-template-columns: 1fr; gap: 32px; }
+  .cer-product-v2__info { position: static; }
+  .cer-specs { grid-template-columns: 1fr; gap: 24px; }
+  .cer-footer-v2__cols { grid-template-columns: 1fr 1fr; gap: 32px; }
+  .cer-footer-v2 { padding: 56px 24px 24px; }
+  .cer-hero-v3 { min-height: 560px; }
+  .cer-numbered__item { grid-template-columns: 56px 1fr; gap: 16px; padding: 28px 0; }
+  .cer-subscribe { flex-direction: column; }
+  .cer-journal-letter { padding: 32px 24px; }
+  .cer-about-triptych { grid-template-columns: 1fr; }
+}
+
+/* ============================================================
+   next/image fill — обёрткам нужны position:relative + aspect-ratio
+   (само <img> позиционируется absolute через inline-стили Image).
+   ============================================================ */
+.cer-card__image-wrap { position: relative; } /* aspect-ratio:1 уже задан выше */
+.cer-two-col__image { position: relative; aspect-ratio: 4 / 5; }
+.cer-product__main-image-wrap { position: relative; aspect-ratio: 1; }
+.cer-project-row__media { position: relative; aspect-ratio: 3 / 2; }
+.cer-case__img-wrap { position: relative; aspect-ratio: 4 / 5; }
+.cer-project-gallery__item { position: relative; aspect-ratio: 1 / 1; }
+.cer-about-triptych > div { position: relative; aspect-ratio: 3 / 4; }
+
+/* Бейдж «Нет в наличии» на карточке товара */
+.cer-card__sold-out {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 2;
+  background: rgba(43, 43, 43, 0.85);
+  color: #fff;
+  padding: 6px 12px;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 500;
+  backdrop-filter: blur(4px);
+}
+
+/* ============================================================
+   Плавное появление картинок (next/image и native <img>).
+   next/image рендерит финальный <img> сразу — без анимации он выскакивает
+   резко. Лёгкий fade на 600ms возвращает мягкость старой ленты.
+   Бьём по конкретным контейнерам, чтобы не задеть служебные UI-картинки
+   (логотипы, иконки).
+   ============================================================ */
+.cer-card__image-wrap img,
+.cer-two-col__image img,
+.cer-product__main-image-wrap img,
+.cer-product-v2__thumb img,
+.cer-project-row__media img,
+.cer-case__img-wrap img,
+.cer-project-gallery__item img,
+.cer-about-triptych > div img,
+.cer-process__image,
+.cer-masonry__item img,
+.cer-atmospheric__bg img,
+.cer-project-hero__bg img,
+.cer-hero-v3__bg img {
+  animation: cerImgFadeIn 600ms ease-out both;
+}
+@keyframes cerImgFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cer-card__image-wrap img,
+  .cer-two-col__image img,
+  .cer-product__main-image-wrap img,
+  .cer-product-v2__thumb img,
+  .cer-project-row__media img,
+  .cer-case__img-wrap img,
+  .cer-project-gallery__item img,
+  .cer-about-triptych > div img,
+  .cer-process__image,
+  .cer-masonry__item img,
+  .cer-atmospheric__bg img,
+  .cer-project-hero__bg img,
+  .cer-hero-v3__bg img {
+    animation: none !important;
+  }
+}
