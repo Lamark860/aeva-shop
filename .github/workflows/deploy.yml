@@ -1,0 +1,48 @@
+name: Deploy to VPS
+
+# Деплой на прод. Триггерится push'ем в master (после auto-merge PR из dev),
+# либо вручную через кнопку Run workflow.
+#
+# Текущий режим — RAW-ПОРТ (один контейнер + проброс APP_PORT, без Traefik/домена):
+# на VPS выполняется scripts/deploy-port.sh. Когда проекту выдадут домен →
+# переключить вызов на scripts/deploy.sh (blue-green за Traefik) + docker-compose.prod-bg.yml.
+# Подробности перехода — в _local_docs/internal/deploy/auto-deploy.md.
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+# Деплои не параллелим: один за другим, текущий не отменяем на полпути.
+concurrency:
+  group: deploy-ceramic
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: SSH redeploy (raw-port)
+    runs-on: ubuntu-latest
+    steps:
+      - name: SSH and redeploy
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT || 22 }}
+          script_stop: true       # упасть на первой же ошибке внутри script
+          command_timeout: 30m    # первая сборка образа Next тяжёлая (npm ci ~4 мин + build)
+          script: |
+            set -e
+            cd "${{ secrets.VPS_PATH }}"
+
+            echo "==> Подтягиваю master"
+            git fetch --all --prune
+            git reset --hard origin/master
+
+            echo "==> Деплой (blue-green отключён до домена → raw-port single-app)"
+            # .env (секреты прода + APP_PORT + NEXT_PUBLIC_SERVER_URL) лежит на сервере,
+            # в git его нет — reset его не трогает. Миграции Payload накатывает сам
+            # deploy-port.sh (сервис migrate) до пересоздания app. Скрипт делает
+            # внутренний health-check /api/healthz и чистку образов/кэша.
+            chmod +x scripts/deploy-port.sh
+            ./scripts/deploy-port.sh
