@@ -1,0 +1,201 @@
+/* ============================================================
+   Кастомизация Payload admin под дизайн-систему сайта.
+   Меняем CSS-переменные Payload (тема), типографику и точечные акценты.
+   Токены — из public/css/ceramic.css.
+   ============================================================ */
+
+:root {
+  /* дизайн-токены сайта (для кастомных admin-компонентов) */
+  --cer-bg: #F6F3EF;
+  --cer-bg-alt: #E6DED6;
+  --cer-text: #2B2B2B;
+  --cer-text-muted: #5A524D;
+  --cer-text-light: #7A726C;
+  --cer-accent: #B7795A;
+  --cer-accent-hover: #A06845;
+  --cer-border: rgba(43, 43, 43, 0.08);
+  --cer-font-heading: 'Playfair Display', Georgia, serif;
+  --cer-font-body: 'Inter', system-ui, sans-serif;
+
+  /* фон/панели */
+  --theme-elevation-0:   #F6F3EF;  /* основной фон */
+  --theme-elevation-50:  #F1ECE5;
+  --theme-elevation-100: #FFFFFF;  /* карточки/инпуты */
+  --theme-elevation-150: #E6DED6;  /* alt-фон, заметки */
+  --theme-elevation-200: #DBD2C8;
+  --theme-elevation-400: #B7AFA6;
+  --theme-elevation-500: #7A726C;
+  --theme-elevation-800: #2B2B2B;  /* sidebar */
+  --theme-elevation-1000: #1A1612;
+
+  /* текст */
+  --theme-text:        #2B2B2B;
+  --theme-text-muted:  #5A524D;
+
+  /* primary action — терракота */
+  --theme-success-500: #B7795A;
+  --theme-success-600: #A06845;
+
+  /* шрифты */
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-serif: 'Playfair Display', Georgia, serif;
+}
+
+/* Глобальный фон страницы и текст */
+body {
+  background: var(--theme-elevation-0);
+  color: var(--theme-text);
+  font-family: var(--font-body);
+}
+
+/* Заголовки админки — Playfair, лёгкая антиква */
+.template-default__wrap h1,
+.template-default__wrap h2,
+.template-default__wrap h3,
+.dashboard__group-label,
+.collection-list__header h1,
+.document-header h1,
+.nav__label {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+/* Боковая навигация — темнее, как в макетах */
+.nav {
+  background: var(--theme-elevation-800);
+}
+.nav__link {
+  color: rgba(255, 255, 255, 0.78);
+}
+.nav__link:hover,
+.nav__link--active {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* Кнопки — primary в терракоте */
+.btn--style-primary {
+  background: var(--theme-success-500);
+  border-color: var(--theme-success-500);
+}
+.btn--style-primary:hover {
+  background: var(--theme-success-600);
+  border-color: var(--theme-success-600);
+}
+
+/* Поле подсказки — курсив, чуть мягче (admin.description) */
+.field-description {
+  font-style: italic;
+  color: var(--theme-text-muted);
+}
+
+/* Логин — кремовый фон, Playfair-заголовок */
+.template-minimal {
+  background: var(--theme-elevation-0);
+}
+.template-minimal h1 {
+  font-family: var(--font-serif);
+  font-weight: 400;
+}
+
+/* ============================================================
+   Responsive-классы для кастомных admin-компонентов.
+   Inline-styles в Dashboard/OrdersListView/ProductWizard невозможно медиа-квирить
+   напрямую — заменяем grid'ы и padding'и на классы с media-query.
+   Breakpoint 700px = планшет/телефон.
+   ============================================================ */
+
+/* контейнер с уменьшенным padding на мобиле */
+.cer-admin-pad { padding: 40px; }
+.cer-admin-pad-list { padding: 32px 40px 40px; }
+
+/* шапка дашборда: десктоп = flex с кнопками справа, мобила = stack */
+.cer-admin-dash-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.cer-admin-dash-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* срочная полоса (новые заявки за 24ч) */
+.cer-admin-urgent {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 24px 32px;
+  margin-bottom: 32px;
+}
+
+/* 3 цифры */
+.cer-admin-digest {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+/* две панели рядом (inbox + последние изделия) */
+.cer-admin-two-panel {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 24px;
+}
+
+/* products mini-grid в правой панели */
+.cer-admin-products-grid {
+  padding: 16px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+/* карточка заявки в OrdersListView */
+.cer-admin-order-card {
+  display: grid;
+  grid-template-columns: 1fr 2fr auto auto;
+  gap: 24px;
+  align-items: center;
+}
+
+/* wizard layout */
+.cer-admin-wizard-pad { padding: 48px 40px; }
+.cer-admin-wizard-grid { display: grid; gap: 32px; }
+.cer-admin-wizard-grid--two { grid-template-columns: 1fr 1.2fr; }
+.cer-admin-wizard-sizes { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+
+@media (max-width: 700px) {
+  .cer-admin-pad { padding: 20px 16px; }
+  .cer-admin-pad-list { padding: 20px 16px 24px; }
+
+  .cer-admin-dash-header { margin-bottom: 24px; gap: 16px; flex-direction: column; align-items: stretch; }
+  .cer-admin-dash-header h1 { font-size: 24px !important; }
+  .cer-admin-dash-header__actions { flex-direction: column; align-items: stretch; gap: 8px; }
+  .cer-admin-dash-header__actions > a,
+  .cer-admin-dash-header__actions > button { width: 100%; text-align: center; }
+
+  .cer-admin-urgent { flex-direction: column; align-items: flex-start; padding: 16px 20px; gap: 12px; margin-bottom: 24px; }
+  .cer-admin-urgent > a { width: 100%; text-align: center; }
+
+  .cer-admin-digest { grid-template-columns: 1fr; gap: 12px; margin-bottom: 24px; }
+  .cer-admin-two-panel { grid-template-columns: 1fr; gap: 16px; }
+  .cer-admin-products-grid { grid-template-columns: 1fr; }
+
+  /* карточка заявки в одну колонку, статус-пилл идёт в конец */
+  .cer-admin-order-card {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding: 16px 18px !important;
+  }
+
+  .cer-admin-wizard-pad { padding: 24px 16px; }
+  .cer-admin-wizard-grid--two { grid-template-columns: 1fr; gap: 20px; }
+  .cer-admin-wizard-sizes { grid-template-columns: 1fr; }
+}

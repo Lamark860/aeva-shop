@@ -3,7 +3,8 @@ import Shell from '@/components/Shell'
 import Lightbox from '@/components/Lightbox'
 import { getGallery } from '@/lib/data'
 
-export const dynamic = 'force-dynamic'
+// ISR: фон-ребилд + мгновенный сброс через revalidatePath из хуков Gallery
+export const revalidate = 3600
 export const metadata = { title: 'Галерея — Керамика' }
 
 export default async function GalleryPage() {
@@ -20,14 +21,22 @@ export default async function GalleryPage() {
 
       <section className="cer-section cer-section--no-top">
         <div className="cer-container">
-          <div className="cer-masonry cer-fade-in">
-            {items.map((item) => (
-              <div className="cer-masonry__item" key={item.title}>
-                <img src={item.image} alt={item.title} loading="lazy" />
-                <div className="cer-masonry__caption">{item.title}</div>
-              </div>
-            ))}
-          </div>
+          {items.length === 0 ? (
+            <div style={{ padding: '80px 24px', textAlign: 'center', color: 'var(--cer-text-muted)' }}>
+              Скоро здесь будут фото из мастерской.
+            </div>
+          ) : (
+            <div className="cer-masonry cer-fade-in">
+              {items.map((item) => (
+                <div className="cer-masonry__item" key={item.title}>
+                  {/* Lightbox в ceramic.js читает <img>.src — оставляем native, чтобы открывался оригинал */}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={item.image} alt={item.title} loading="lazy" />
+                  <div className="cer-masonry__caption">{item.title}</div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 

@@ -8,7 +8,11 @@
     "build": "next build",
     "start": "next start",
     "generate:types": "payload generate:types",
-    "seed": "payload run scripts/seed.ts"
+    "seed": "payload run scripts/seed.ts",
+    "import:aeva": "payload run scripts/import-aeva.ts",
+    "cleanup:dummy": "payload run scripts/cleanup-dummy.ts",
+    "seed:globals": "payload run scripts/seed-globals.ts",
+    "feature:vases": "payload run scripts/feature-vases.ts"
   },
   "dependencies": {
     "@payloadcms/db-postgres": "3.84.1",
@@ -17,6 +21,7 @@
     "@payloadcms/ui": "3.84.1",
     "graphql": "^16.9.0",
     "next": "15.4.11",
+    "nodemailer": "^6.10.1",
     "payload": "3.84.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
@@ -24,6 +29,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.5.4",
+    "@types/nodemailer": "^6.4.23",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "typescript": "^5.6.3"

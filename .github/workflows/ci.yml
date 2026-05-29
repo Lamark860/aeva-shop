@@ -1,0 +1,41 @@
+name: CI
+
+# Гейт качества. Запускается:
+#  - на PR в master  → обязательная проверка для auto-merge (см. branch protection)
+#  - на push в master/dev → быстрая обратная связь по веткам
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master, dev]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build (next build + typecheck)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'        # совпадает с node:22-alpine в Dockerfile
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Build (next build — типизация + сборка)
+        env:
+          NEXT_TELEMETRY_DISABLED: '1'
+          # БД для сборки НЕ нужна: data-getter'ы в src/lib/data.ts на этапе
+          # next build (NEXT_PHASE=phase-production-build) отдают дефолты/пусто
+          # вместо обращения к Postgres. PAYLOAD_SECRET-плейсхолдер — только чтобы
+          # init Payload проходил чисто (как build-time ENV в Dockerfile).
+          PAYLOAD_SECRET: ci-build-placeholder-not-used-at-runtime
+        run: npm run build

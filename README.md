@@ -1,69 +1,82 @@
 # ceramic
 
-Магазин авторской керамики ручной работы. **Next.js 15 (App Router) + Payload 3 + Postgres.**
+Магазин авторской керамики ручной работы. **Next.js 15 (App Router) + Payload 3.84 + Postgres 16.**
 Витрина и админка — в одном приложении, Payload как встроенная CMS.
 
-Перенесён со старого Yii2-модуля; дизайн-система и анимации сохранены без изменений
-(см. `_visual/` — переносимый референс CSS/JS, демо-данные и старые вьюхи).
+Перенесён со старого Yii2-модуля; дизайн 1:1 в `_visual/`. Контент — реальные товары
+и тексты с [shop-aeva.ru](https://shop-aeva.ru) (16 ваз + 12 единиц посуды + страницы об авторе / доставке / контактах).
 
 ## Запуск локально
 
+Всё через Docker, локально `npm` не запускаем (node_modules контейнера ≠ хоста).
+
 ```bash
-npm install
+docker compose -f docker-compose.dev.yml up -d
+# витрина http://localhost:3070 · админка http://localhost:3070/admin
+# postgres наружу localhost:5470 (для DataGrip / psql)
 
-# Postgres для dev (отдельный контейнер на :5435)
-docker start ceramic-next-pg   # уже создан; либо см. docker-compose.local.yml
+# первый запуск БД: создать схему + админа + базовые seed
+docker compose -f docker-compose.dev.yml exec app npm run seed
 
-npm run seed                   # схема + админ + демо-данные (идемпотентно)
-npm run dev                    # http://localhost:3000
+# залить контент aeva (нужны файлы в imports/aeva/, см. ROADMAP.md)
+docker compose -f docker-compose.dev.yml exec app npm run import:aeva
 ```
 
-- Витрина: http://localhost:3000
-- Админка: http://localhost:3000/admin
+Hot reload работает через bind mount; `node_modules` и `.next` — анонимные volumes.
 
-`.env` задаёт `DATABASE_URI` и `PAYLOAD_SECRET`. Схема в Postgres создаётся
-автоматически (push-режим) при первом обращении Payload.
-
-## Docker
-
-- `Dockerfile` — multi-stage standalone (Next `output: 'standalone'`)
-- `docker-compose.yml` — **продакшн** под Traefik (TLS/Let's Encrypt, без портов наружу)
-- `docker-compose.local.yml` — локальная проверка прод-образа без Traefik
-
-### Локально (прод-образ)
+### Полезные команды внутри контейнера
 ```bash
-docker compose -f docker-compose.local.yml up --build
-# витрина http://localhost:3001 · админка http://localhost:3001/admin
+docker compose -f docker-compose.dev.yml exec app npm run generate:types        # после правки коллекций
+docker compose -f docker-compose.dev.yml exec app npx payload migrate:create <name>
+docker compose -f docker-compose.dev.yml exec app npx payload generate:importmap  # после добавления admin-компонента
 ```
+
+## Прод
+
+- `Dockerfile` — multi-stage standalone (Next `output: 'standalone'`, образ ~250-350 МБ)
+- `docker-compose.yml` — **текущий прод**, single-instance под Traefik (TLS/Let's Encrypt, без портов наружу)
+- `docker-compose.prod-bg.yml` — blue/green вариант (инфра готова, ещё не задеплоена — см. ROADMAP #3)
+- `docker-compose.local.yml` — локальная проверка прод-образа без Traefik (на :3001)
 
 ### На VPS (Traefik)
 ```bash
 cp .env.example .env          # DOMAIN, DB_PASSWORD, PAYLOAD_SECRET (openssl rand -base64 32)
-docker compose build
+docker network create proxy   # если ещё нет общей сети с Traefik
 docker compose up -d
 docker compose logs -f app
 ```
-Подгони под свой Traefik: внешняя сеть (`proxy`), entrypoints (`web`/`websecure`),
-certresolver (`letsencrypt`) — `docker network ls` и твой `traefik.yml`.
-Первого админа заводишь на `/admin`.
 
-**Про `./uploads:/app/media`:** том под загрузку файлов, но сейчас изображения —
-внешние URL, не файлы. Пока том no-op; оживёт с upload-коллекцией `Media` (см. ниже).
+Миграции Payload накатываются one-shot сервисом `migrate` до старта `app`.
 
 ## Структура
-- `src/app/(frontend)/` — витрина (главная/каталог/товар/галерея/заявка)
-- `src/app/(payload)/`  — admin UI + REST/GraphQL (boilerplate Payload)
-- `src/collections/`    — Categories / Products / Gallery / Orders / Users
-- `src/lib/data.ts`     — данные через Payload Local API (без HTTP)
-- `src/components/`      — Shell (навбар/футер), ProductCard
-- `public/css|js`        — дизайн-система и анимации
-- `scripts/seed.ts`      — сидинг через `payload run`
-- `_visual/`             — референс: исходный CSS/JS, демо-данные, старые .php-вьюхи
+```
+src/
+  app/(frontend)/    — витрина: главная, /catalog, /product/[slug], /about, /care,
+                       /horeca, /journal, /gallery, /order, /projects, /pages/[slug]
+  app/(payload)/     — admin UI + REST/GraphQL (boilerplate Payload, не править вручную)
+  collections/       — Categories, Products, Media, Orders, Pages, Subscribers,
+                       Gallery, Projects, HorecaInquiries, Users
+  globals/Homepage/  — редактируемая главная страница
+  admin/             — кастомные компоненты Payload-админки:
+                       admin.css, Logo, Icon, ImageCell, Dashboard,
+                       OrdersListView, ProductWizard
+  lib/data.ts        — единственная точка доступа к данным через Payload Local API
+  lib/revalidate.ts  — ISR-сброс кэша из хуков
+  components/        — Shell (nav+footer), ProductCard, ProductGallery,
+                       Lightbox, StickyNav, fx/* (FadeIn/RevealMask/CountUp/Parallax)
+  migrations/        — Payload миграции (накатываются на проде)
+public/css|js        — дизайн-система и анимации (источник — _visual/)
+scripts/             — seed.ts, import-aeva.ts
+imports/aeva/        — `vases.json` / `tableware.json` / `about/delivery/contacts/hero.json`
+                       + photos/{slug}/ (бэкап оригиналов для re-import; не в git)
+_visual/             — переносимый референс CSS/JS, демо-данные, старые .php-вьюхи
+design_handoff/      — макеты витрины (Mockups.html, Prototype.html, artboards/)
+design_handoff_admin/— макеты админки (AdminMockups.html, admin/*.jsx по экранам)
+```
 
-## Доступы (dev/спайк — сменить для прода!)
+## Доступы (dev — сменить для прода!)
 - Админка: `admin@ceramic.local` / `ceramic123`
 
-## Дальнейшие шаги
-- Media-коллекция Payload (upload) → фото через админку, том `uploads` оживает
-- email-адаптер для уведомлений о заявках (сейчас в консоль)
-- миграции Payload вместо push-режима для контролируемых деплоев
+## Что дальше
+См. [ROADMAP.md](./ROADMAP.md) — что сделано и что планируется.
+Подробности по архитектуре и граблям — [CLAUDE.md](./CLAUDE.md).

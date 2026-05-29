@@ -1,0 +1,69 @@
+# Полный dev-стек: Next.js (hot reload) + Postgres.
+# Запуск: docker compose -f docker-compose.dev.yml up
+#   витрина:    http://localhost:3070
+#   админка:    http://localhost:3070/admin
+#   Postgres:   localhost:5470  (для DataGrip/psql)
+# Порты выбраны нестандартными, чтобы не конфликтовать с другими проектами.
+#
+# Hot reload работает через bind mount всего репозитория поверх /app.
+# node_modules и .next держим в анонимных volumes контейнера — чтобы
+# хостовая macOS-папка (native arm64/x86) не конфликтовала с alpine
+# и не тормозила сборку.
+#
+# Старый контейнер `ceramic-next-pg` оставлен независимо — этот compose
+# поднимает свой Postgres с отдельным volume `ceramic_dev_pg_data`.
+
+name: ceramic-dev
+
+services:
+  app:
+    build:
+      context: .
+      target: dev
+    container_name: ceramic-app-dev
+    restart: unless-stopped
+    ports:
+      - "3070:3000"
+    environment:
+      DATABASE_URI: postgres://ceramic:ceramic_secret@postgres:5432/ceramic
+      PAYLOAD_SECRET: ceramic-spike-secret-change-me
+      MEDIA_DIR: /app/media
+      NODE_ENV: development
+      NEXT_TELEMETRY_DISABLED: "1"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+      - ceramic_dev_uploads:/app/media
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - dev
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: ceramic-postgres-dev
+    restart: unless-stopped
+    ports:
+      - "5470:5432"
+    environment:
+      POSTGRES_DB: ceramic
+      POSTGRES_USER: ceramic
+      POSTGRES_PASSWORD: ceramic_secret
+    volumes:
+      - ceramic_dev_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ceramic"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - dev
+
+networks:
+  dev:
+
+volumes:
+  ceramic_dev_pg_data:
+  ceramic_dev_uploads:

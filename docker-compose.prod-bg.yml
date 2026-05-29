@@ -1,0 +1,140 @@
+# Blue-green compose для VPS. Альтернатива docker-compose.yml для безопасного деплоя.
+# Два сервиса app-blue / app-green с одинаковыми Traefik labels — Traefik сам load-balance'ит
+# между ними и исключает не-healthy backend через свой healthcheck по /api/healthz.
+#
+# Использование:
+#   1) Первый запуск:
+#        docker compose -f docker-compose.prod-bg.yml up -d postgres migrate app-blue
+#   2) Ребилд без даунтайма (см. scripts/deploy.sh):
+#        ./scripts/deploy.sh
+#      Скрипт сам определит активный цвет и запустит другой.
+#
+# Требования: внешняя сеть `proxy` с подключённым Traefik (как в docker-compose.yml).
+
+services:
+  migrate:
+    build:
+      context: .
+      target: builder
+    command: npx payload migrate
+    restart: "no"
+    environment:
+      DATABASE_URI: postgres://ceramic:${DB_PASSWORD}@postgres:5432/ceramic
+      PAYLOAD_SECRET: ${PAYLOAD_SECRET}
+    networks:
+      - internal
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  app-blue:
+    build: .
+    container_name: ceramic-app-blue
+    restart: unless-stopped
+    environment: &app_env
+      DATABASE_URI: postgres://ceramic:${DB_PASSWORD}@postgres:5432/ceramic
+      PAYLOAD_SECRET: ${PAYLOAD_SECRET}
+      NEXT_PUBLIC_SERVER_URL: https://${DOMAIN}
+      NODE_ENV: production
+      MEDIA_DIR: /app/media
+      DOMAIN: ${DOMAIN}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      TELEGRAM_CHAT_ID: ${TELEGRAM_CHAT_ID:-}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      SMTP_FROM: ${SMTP_FROM:-}
+      ORDER_EMAIL_TO: ${ORDER_EMAIL_TO:-}
+    volumes:
+      - ./uploads:/app/media
+    networks:
+      - internal
+      - proxy
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    logging: &app_logging
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    # Оба цвета вешают одинаковые Traefik labels. Traefik видит один service `ceramic`
+    # с двумя backends. healthcheck-label заставит Traefik проверять /api/healthz и
+    # исключать backend, пока тот не отвечает 200.
+    labels: &app_labels
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.ceramic.rule=Host(`${DOMAIN}`)"
+      - "traefik.http.routers.ceramic.entrypoints=websecure"
+      - "traefik.http.routers.ceramic.tls=true"
+      - "traefik.http.routers.ceramic.tls.certresolver=letsencrypt"
+      - "traefik.http.services.ceramic.loadbalancer.server.port=3000"
+      - "traefik.http.services.ceramic.loadbalancer.healthcheck.path=/api/healthz"
+      - "traefik.http.services.ceramic.loadbalancer.healthcheck.interval=5s"
+      - "traefik.http.services.ceramic.loadbalancer.healthcheck.timeout=3s"
+      - "traefik.http.routers.ceramic-http.rule=Host(`${DOMAIN}`)"
+      - "traefik.http.routers.ceramic-http.entrypoints=web"
+      - "traefik.http.routers.ceramic-http.middlewares=https-redirect"
+      - "traefik.http.middlewares.https-redirect.redirectscheme.scheme=https"
+
+  app-green:
+    build: .
+    container_name: ceramic-app-green
+    restart: unless-stopped
+    environment: *app_env
+    volumes:
+      - ./uploads:/app/media
+    networks:
+      - internal
+      - proxy
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    logging: *app_logging
+    labels: *app_labels
+    # green по умолчанию выключен — поднимается deploy-скриптом
+    profiles: ["green"]
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: ceramic-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ceramic
+      POSTGRES_USER: ceramic
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ceramic"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    logging: *app_logging
+
+networks:
+  internal:
+  proxy:
+    external: true
+
+volumes:
+  postgres-data:

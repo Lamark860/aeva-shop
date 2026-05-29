@@ -1,0 +1,110 @@
+# Временный ПРОД-режим: один app-контейнер с пробросом порта (raw IP:порт), без Traefik/домена.
+# Используется, пока проекту не выдан домен (домены приедут ко всем проектам разом).
+#
+# Когда домен приедет → переход на blue-green за Traefik делается так:
+#   1) снять проброс порта (этот файл больше не нужен);
+#   2) поднять docker-compose.prod-bg.yml + scripts/deploy.sh (blue-green, Traefik-лейблы);
+#   3) в .env задать DOMAIN, в deploy.yml переключить вызов на scripts/deploy.sh.
+# Подробности перехода — в _local_docs/internal/deploy/auto-deploy.md.
+#
+# Запуск на VPS (из /opt/projects/ceramic, рядом .env):
+#   docker compose -f docker-compose.prod-port.yml up -d --build
+# Штатный (ре)деплой — через scripts/deploy-port.sh (его дёргает .github/workflows/deploy.yml).
+#
+# Доступ: http://<IP>:${APP_PORT}  ·  админка: http://<IP>:${APP_PORT}/admin
+#
+# Тома/бинды НАМЕРЕННО совпадают с docker-compose.yml и docker-compose.prod-bg.yml
+# (volume postgres-data, bind ./uploads), чтобы переключение режимов НЕ теряло данные:
+# имя проекта = имя папки (ceramic) → том всегда ceramic_postgres-data.
+
+services:
+  # one-shot: накатывает миграции Payload до старта app, затем выходит.
+  migrate:
+    build:
+      context: .
+      target: builder
+    command: npx payload migrate
+    restart: "no"
+    environment:
+      DATABASE_URI: postgres://ceramic:${DB_PASSWORD}@postgres:5432/ceramic
+      PAYLOAD_SECRET: ${PAYLOAD_SECRET}
+    networks:
+      - internal
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  app:
+    build: .
+    container_name: ceramic-app
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-8092}:3000"
+    environment:
+      DATABASE_URI: postgres://ceramic:${DB_PASSWORD}@postgres:5432/ceramic
+      PAYLOAD_SECRET: ${PAYLOAD_SECRET}
+      # Для raw-порта это http://<IP>:<APP_PORT> (печётся в cors/csrf и клиентские ссылки).
+      NEXT_PUBLIC_SERVER_URL: ${NEXT_PUBLIC_SERVER_URL}
+      NODE_ENV: production
+      MEDIA_DIR: /app/media
+      # Уведомления о заявках (пустые → канал пропускается)
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      TELEGRAM_CHAT_ID: ${TELEGRAM_CHAT_ID:-}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      SMTP_FROM: ${SMTP_FROM:-}
+      ORDER_EMAIL_TO: ${ORDER_EMAIL_TO:-}
+    volumes:
+      - ./uploads:/app/media
+    networks:
+      - internal
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: ceramic-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ceramic
+      POSTGRES_USER: ceramic
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ceramic"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    # никаких ports наружу — Postgres только во внутренней сети
+
+networks:
+  internal:
+
+volumes:
+  postgres-data:
