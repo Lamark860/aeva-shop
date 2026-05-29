@@ -19,6 +19,10 @@ node_modules/
 # рабочие скриншоты dev-проверок (генерятся через chrome-devtools MCP)
 /screenshots/
 
+# дизайн-макеты — внутренняя референс-документация, не в git (хранятся локально)
+/design_handoff/
+/design_handoff_admin/
+
 # импорт-кэш с shop-aeva.ru (~170МБ оригиналов фото + JSON) — локальный «бэкап» для re-import.
 # В git не пускаем; для нового VPS достаточно `npm run import:aeva` если положить эти файлы рядом.
 /imports/
